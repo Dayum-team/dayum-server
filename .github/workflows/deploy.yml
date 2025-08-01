@@ -10,7 +10,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: appleboy/ssh-action@v1
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.SERVER_SSH_PORT || 22 }}" -H "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+      - name: Run bootstrap via SSH
+        uses: appleboy/ssh-action@v1
         env:
           AWS_ACCESS_TOKEN: ${{ secrets.AWS_ACCESS_TOKEN }}
           AWS_SECRET_TOKEN: ${{ secrets.AWS_SECRET_TOKEN }}
