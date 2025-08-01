@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: test
+        run: |
+          echo "${{ secrets.SERVER_SSH_USER }}"
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
