@@ -59,4 +59,3 @@ jobs:
           script: |
             set -euo pipefail
             bash -lc "~/bootstrap.sh"
-
