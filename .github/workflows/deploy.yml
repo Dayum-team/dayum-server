@@ -10,15 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug SSH key locally
-        run: |
-          set -euo pipefail
-          printf '%s\n' "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" | tr -d '\r' > id.key
-          chmod 600 id.key
-          # 공개키 생성
-          ssh-keygen -y -f id.key > id.key.pub
-          echo "Public key fingerprint (sha256):"
-          ssh-keygen -lf id.key.pub -E sha256
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
