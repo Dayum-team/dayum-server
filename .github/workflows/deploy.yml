@@ -10,21 +10,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check secrets (presence, length, hash)
-        env:
-          U: ${{ secrets.SERVER_SSH_USER }}
-          K: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+      - name: Debug SSH key locally
         run: |
           set -euo pipefail
-          [[ -n "${U:-}" ]] || { echo "SERVER_SSH_USER MISSING"; exit 1; }
-          [[ -n "${K:-}" ]] || { echo "SERVER_SSH_PRIVATE_KEY MISSING"; exit 1; }
-
-          echo "SERVER_SSH_USER len=${#U}"
-          printf "%s" "$U" | sha256sum | awk '{print "SERVER_SSH_USER sha256="$1}'
-
-          # 멀티라인 키일 때 유용
-          echo "SERVER_SSH_PRIVATE_KEY lines=$(printf "%s" "$K" | wc -l)"
-          printf "%s" "$K" | sha256sum | awk '{print "SERVER_SSH_PRIVATE_KEY sha256="$1}'
+          printf '%s\n' "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" | tr -d '\r' > id.key
+          chmod 600 id.key
+          # 공개키 생성
+          ssh-keygen -y -f id.key > id.key.pub
+          echo "Public key fingerprint (sha256):"
+          ssh-keygen -lf id.key.pub -E sha256
       - name: Add server to known_hosts
         run: |
           mkdir -p ~/.ssh
