@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Build
+build/
+.gradle/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+HELP.md
+
+# Environment
+.env
+.env
+
+# Test
+src/test/ 

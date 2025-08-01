@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: Dayum-server
+  
+  
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dayum_db}
+    username: ${DB_USERNAME:dayum_user}
+    password: ${DB_PASSWORD:dayum_password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: ${SPRING_JPA_FORMAT_SQL:false}
+        dialect: org.hibernate.dialect.MySQLDialect
+
+# Server Configuration
+server:
+  port: ${APP_PORT:8080}
