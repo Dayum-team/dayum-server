@@ -1,6 +1,7 @@
 name: deploy
 
-on: []
+on:
+  workflow_dispatch:
 
 jobs:
   Test-GitHub-Action:
