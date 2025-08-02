@@ -20,9 +20,9 @@ public class ContentsController {
 
   @GetMapping
   public ApiResponse<PageResponse<ContentsResponse>> retrieveAllContents(
-      @RequestParam(value = "previous", defaultValue = "0") long previousContentsId,
+      @RequestParam(value = "cursor", defaultValue = "0") long cursorId,
       @RequestParam(value = "size", defaultValue = "15") int size) {
-    var contentsPage = contentsService.retrieveNextPage(previousContentsId, size);
+    var contentsPage = contentsService.retrieveNextPage(cursorId, size);
     return ApiResponse.of(contentsPage);
   }
 

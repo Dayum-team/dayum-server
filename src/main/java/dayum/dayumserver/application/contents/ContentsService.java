@@ -1,7 +1,6 @@
 package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.response.PageResponse;
-import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import dayum.dayumserver.domain.contents.ContentsRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +12,9 @@ public class ContentsService {
 
   private final ContentsRepository contentsRepository;
 
-  public PageResponse<ContentsResponse> retrieveNextPage(long previousId, int size) {
+  public PageResponse<ContentsResponse> retrieveNextPage(long cursorId, int size) {
     var contentsList =
-        contentsRepository.fetchNextPage(previousId, size + 1).stream()
+        contentsRepository.fetchNextPage(cursorId, size + 1).stream()
             .map(ContentsResponse::from)
             .toList();
 
@@ -25,10 +24,5 @@ public class ContentsService {
     var items = contentsList.subList(0, size);
     return new PageResponse<>(
         items, new PageResponse.PageInfo(String.valueOf(contentsList.getLast().id()), false));
-  }
-
-  public ContentsDetailResponse retrieve(long id) {
-    var contents = contentsRepository.fetchBy(id);
-    return ContentsDetailResponse.from(contents);
   }
 }

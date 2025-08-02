@@ -18,8 +18,8 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   private final ContentsMapper contentsMapper;
 
   @Override
-  public List<Contents> fetchNextPage(long previousId, int size) {
-    return contentsJpaRepository.findNextPage(previousId, size).stream()
+  public List<Contents> fetchNextPage(long cursorId, int size) {
+    return contentsJpaRepository.findNextPage(cursorId, size).stream()
         .map(contentsMapper::mapToDomainEntity)
         .toList();
   }
