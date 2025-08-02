@@ -19,11 +19,11 @@ public class S3ClientService {
   private final NcpProperties ncpProperties;
   private final S3Client s3Client;
 
-  public Optional<S3Object> get(String folder, String fileName) {
+  public Optional<S3Object> get(String path, String fileName) {
     var request =
         ListObjectsV2Request.builder()
             .bucket(ncpProperties.getS3Bucket())
-            .prefix(String.join("/", folder, fileName))
+            .prefix(String.join("/", path, fileName))
             .maxKeys(1)
             .build();
     return s3Client.listObjectsV2(request).contents().stream().findFirst();
