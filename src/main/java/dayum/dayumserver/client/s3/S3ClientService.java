@@ -16,15 +16,16 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 @RequiredArgsConstructor
 public class S3ClientService {
 
-	private final NcpProperties ncpProperties;
-	private final S3Client s3Client;
+  private final NcpProperties ncpProperties;
+  private final S3Client s3Client;
 
-	public Optional<S3Object> get(String folder, String fileName) {
-      var request = ListObjectsV2Request.builder()
-          .bucket(ncpProperties.getS3Bucket())
-          .prefix(String.join("/",  folder, fileName))
-          .maxKeys(1)
-          .build();
-      return s3Client.listObjectsV2(request).contents().stream().findFirst();
-	}
+  public Optional<S3Object> get(String folder, String fileName) {
+    var request =
+        ListObjectsV2Request.builder()
+            .bucket(ncpProperties.getS3Bucket())
+            .prefix(String.join("/", folder, fileName))
+            .maxKeys(1)
+            .build();
+    return s3Client.listObjectsV2(request).contents().stream().findFirst();
+  }
 }

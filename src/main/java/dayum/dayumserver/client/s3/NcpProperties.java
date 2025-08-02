@@ -12,9 +12,9 @@ import lombok.Setter;
 @ConfigurationProperties("ncp")
 public class NcpProperties {
 
-	private String region;
-	private String accessKey;
-	private String secretKey;
-	private String s3Endpoint;
-	private String s3Bucket;
+  private String region;
+  private String accessKey;
+  private String secretKey;
+  private String s3Endpoint;
+  private String s3Bucket;
 }
