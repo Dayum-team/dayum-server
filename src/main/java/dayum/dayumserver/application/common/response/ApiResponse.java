@@ -1,4 +1,4 @@
-package dayum.dayumserver.common.response;
+package dayum.dayumserver.application.common.response;
 
 import lombok.Getter;
 
