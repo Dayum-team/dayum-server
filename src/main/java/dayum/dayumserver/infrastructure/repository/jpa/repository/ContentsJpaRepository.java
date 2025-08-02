@@ -17,5 +17,5 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
           + "ORDER BY contents.id "
           + "LIMIT :size")
   List<ContentsJpaEntity> findNextPage(
-      @Param("previousId") long previousId, @Param("size") long size);
+      @Param("previousId") long previousId, @Param("size") int size);
 }

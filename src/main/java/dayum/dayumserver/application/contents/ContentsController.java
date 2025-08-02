@@ -1,6 +1,7 @@
 package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.response.ApiResponse;
+import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,10 @@ public class ContentsController {
   private final ContentsService contentsService;
 
   @GetMapping
-  public ApiResponse<List<ContentsResponse>> retrieveAllContents(
+  public ApiResponse<PageResponse<ContentsResponse>> retrieveAllContents(
       @RequestParam(value = "previous", defaultValue = "0") long previousContentsId,
-      @RequestParam("size") long size) {
-    var contents = contentsService.retrieveNextPage(previousContentsId, size);
-    return ApiResponse.of(contents);
+      @RequestParam(value = "size", defaultValue = "15") int size) {
+    var contentsPage = contentsService.retrieveNextPage(previousContentsId, size);
+    return ApiResponse.of(contentsPage);
   }
 }
