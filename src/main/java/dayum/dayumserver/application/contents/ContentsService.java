@@ -1,5 +1,6 @@
 package dayum.dayumserver.application.contents;
 
+import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import dayum.dayumserver.domain.contents.ContentsRepository;
 import java.util.List;
@@ -16,5 +17,10 @@ public class ContentsService {
     return contentsRepository.fetchNextPage(previousId, size).stream()
         .map(ContentsResponse::from)
         .toList();
+  }
+
+  public ContentsDetailResponse retrieve(long id) {
+    var contents = contentsRepository.fetchBy(id);
+    return ContentsDetailResponse.from(contents);
   }
 }
