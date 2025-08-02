@@ -1,7 +1,7 @@
-package dayum.dayumserver.common.response;
+package dayum.dayumserver.application.common.response;
 
-import dayum.dayumserver.common.exception.AppException;
-import dayum.dayumserver.common.exception.AppExceptionCode;
+import dayum.dayumserver.application.common.exception.AppException;
+import dayum.dayumserver.application.common.exception.AppExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

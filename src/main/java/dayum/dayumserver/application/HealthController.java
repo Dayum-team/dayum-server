@@ -1,11 +1,11 @@
-package dayum.dayumserver.sample.presentation;
+package dayum.dayumserver.application;
 
 import dayum.dayumserver.application.common.response.ApiResponse;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/samples")
-public class SampleController {
+public class HealthController {
 
   @GetMapping("/health")
   public ApiResponse<String> healthCheck() {
