@@ -31,7 +31,6 @@ ncp:
   access-key: ${ncp.access-key}
   secret-key: ${ncp.secret-key}
   s3-endpoint: https://kr.object.ncloudstorage.com
-  s3-bucket: dayum2
 
 ---
 spring:
@@ -46,6 +45,9 @@ spring:
     password: dayum2_password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+ncp:
+  s3-bucket: dayum2-dev
+
 ---
 spring:
   config:
@@ -58,3 +60,6 @@ spring:
     username: ${mysql.username}
     password: ${mysql.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+ncp:
+  s3-bucket: dayum2-prod
