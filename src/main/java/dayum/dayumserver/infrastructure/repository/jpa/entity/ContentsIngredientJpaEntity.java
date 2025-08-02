@@ -29,10 +29,10 @@ public class ContentsIngredientJpaEntity extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(referencedColumnName = "contents_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+  @JoinColumn(name = "contents_id", referencedColumnName = "contents_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
   private ContentsJpaEntity contents;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(referencedColumnName = "ingredient_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+  @JoinColumn(name = "ingredient_id", referencedColumnName = "ingredient_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
   private IngredientJpaEntity ingredient;
 }
