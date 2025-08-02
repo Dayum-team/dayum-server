@@ -8,6 +8,15 @@ spring:
   profiles:
     active: local
 
+  cloud.aws:
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: ${ACCESS_TOKEN}
+      secret-key: ${SECRET_TOKEN}
+    s3:
+      enabled: false
+
   jpa:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
@@ -17,11 +26,19 @@ spring:
         format_sql: ${SPRING_JPA_FORMAT_SQL:false}
         dialect: org.hibernate.dialect.MySQLDialect
 
+ncp:
+  region: kr-standard
+  access-key: ${ncp.access-key}
+  secret-key: ${ncp.secret-key}
+  s3-endpoint: https://kr.object.ncloudstorage.com
+  s3-bucket: dayum2
+
 ---
 spring:
   config:
     activate:
       on-profile: local
+    import: 'aws-secretsmanager:dayum/server/dev'
 
   datasource:
     url: jdbc:mysql://localhost:3306/dayum
@@ -35,13 +52,6 @@ spring:
     activate:
       on-profile: prod
     import: 'aws-secretsmanager:dayum/server/prod'
-
-  cloud.aws:
-    region:
-      static: ap-northeast-2
-    credentials:
-      access-key: ${ACCESS_TOKEN}
-      secret-key: ${SECRET_TOKEN}
 
   datasource:
     url: jdbc:mysql://${mysql.host}:${mysql.port}/dayum

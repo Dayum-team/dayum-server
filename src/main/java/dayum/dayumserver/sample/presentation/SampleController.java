@@ -1,7 +1,7 @@
 package dayum.dayumserver.sample.presentation;
 
-import org.springframework.web.bind.annotation.*;
 import dayum.dayumserver.common.response.ApiResponse;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/samples")
