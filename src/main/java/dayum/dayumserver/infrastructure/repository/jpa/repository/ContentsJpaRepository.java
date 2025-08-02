@@ -13,9 +13,8 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
   @Query(
       "SELECT contents "
           + "FROM ContentsJpaEntity contents "
-          + "WHERE contents.id > :previousId "
+          + "WHERE contents.id >= :id "
           + "ORDER BY contents.id "
           + "LIMIT :size")
-  List<ContentsJpaEntity> findNextPage(
-      @Param("previousId") long previousId, @Param("size") int size);
+  List<ContentsJpaEntity> findNextPage(@Param("id") long id, @Param("size") int size);
 }

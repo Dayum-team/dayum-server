@@ -13,8 +13,8 @@ public class ContentsService {
 
   private final ContentsRepository contentsRepository;
 
-  public PageResponse<ContentsResponse> retrieveNextPage(long previousId, int size) {
-    var contentsList = contentsRepository.fetchNextPage(previousId, size + 1).stream()
+  public PageResponse<ContentsResponse> retrieveNextPage(long id, int size) {
+    var contentsList = contentsRepository.fetchNextPage(id, size + 1).stream()
         .map(ContentsResponse::from)
         .toList();
 

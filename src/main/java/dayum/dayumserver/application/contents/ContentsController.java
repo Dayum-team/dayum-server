@@ -3,7 +3,6 @@ package dayum.dayumserver.application.contents;
 import dayum.dayumserver.application.common.response.ApiResponse;
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +18,9 @@ public class ContentsController {
 
   @GetMapping
   public ApiResponse<PageResponse<ContentsResponse>> retrieveAllContents(
-      @RequestParam(value = "previous", defaultValue = "0") long previousContentsId,
+      @RequestParam(value = "cursor", defaultValue = "0") long startId,
       @RequestParam(value = "size", defaultValue = "15") int size) {
-    var contentsPage = contentsService.retrieveNextPage(previousContentsId, size);
+    var contentsPage = contentsService.retrieveNextPage(startId, size);
     return ApiResponse.of(contentsPage);
   }
 }
