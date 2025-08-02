@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class IngredientJpaEntity extends BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "ingredient_id")
   private Long id;
 

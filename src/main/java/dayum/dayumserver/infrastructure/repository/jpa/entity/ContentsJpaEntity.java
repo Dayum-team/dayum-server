@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class ContentsJpaEntity extends BaseEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "contents_id")
   private Long id;
 
