@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "members")
+@Table(name = "ingredients")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IngredientJpaEntity extends BaseEntity {
