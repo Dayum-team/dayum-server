@@ -18,7 +18,7 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   private final ContentsMapper contentsMapper;
 
   @Override
-  public List<Contents> fetchNextPage(long previousId, long size) {
+  public List<Contents> fetchNextPage(long previousId, int size) {
     return contentsJpaRepository.findNextPage(previousId, size).stream()
         .map(contentsMapper::mapToDomainEntity)
         .toList();
@@ -26,8 +26,6 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
 
   @Override
   public Contents fetchBy(long id) {
-    return contentsJpaRepository.findById(id)
-        .map(contentsMapper::mapToDomainEntity)
-        .orElseThrow();
+    return contentsJpaRepository.findById(id).map(contentsMapper::mapToDomainEntity).orElseThrow();
   }
 }

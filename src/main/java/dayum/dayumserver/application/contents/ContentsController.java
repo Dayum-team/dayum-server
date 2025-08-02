@@ -1,9 +1,9 @@
 package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.response.ApiResponse;
+import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,11 +19,11 @@ public class ContentsController {
   private final ContentsService contentsService;
 
   @GetMapping
-  public ApiResponse<List<ContentsResponse>> retrieveAllContents(
+  public ApiResponse<PageResponse<ContentsResponse>> retrieveAllContents(
       @RequestParam(value = "previous", defaultValue = "0") long previousContentsId,
-      @RequestParam("size") long size) {
-    var contentsList = contentsService.retrieveNextPage(previousContentsId, size);
-    return ApiResponse.of(contentsList);
+      @RequestParam(value = "size", defaultValue = "15") int size) {
+    var contentsPage = contentsService.retrieveNextPage(previousContentsId, size);
+    return ApiResponse.of(contentsPage);
   }
 
   @GetMapping("/{id}")
