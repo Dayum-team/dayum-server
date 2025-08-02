@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface ContentsRepository {
 
-  List<Contents> fetchNextPage(long id, int size);
+  List<Contents> fetchNextPage(long cursorId, int size);
 }
