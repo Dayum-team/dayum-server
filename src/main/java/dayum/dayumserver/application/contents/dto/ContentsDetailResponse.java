@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import dayum.dayumserver.domain.contents.Contents;
 
+// TODO(chanjun.park): Add fields for nutritional information
 public record ContentsDetailResponse(
     long id, long memberId, String memberNickname, String url, LocalDateTime uploadedAt) {
 
