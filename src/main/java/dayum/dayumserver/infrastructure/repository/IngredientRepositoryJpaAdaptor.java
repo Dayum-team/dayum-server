@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class IngredientRepositoryAdaptor implements IngredientRepository {
+public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
 
   private final IngredientJpaRepository ingredientJpaRepository;
 }

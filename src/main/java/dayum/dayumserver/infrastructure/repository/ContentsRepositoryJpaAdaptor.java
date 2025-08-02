@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ContentsRepositoryAdaptor implements ContentsRepository {
+public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
 
   private final ContentsJpaRepository contentsJpaRepository;
 }
