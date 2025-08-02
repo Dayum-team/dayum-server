@@ -11,17 +11,12 @@ public class Contents {
 
   private Long id;
   private final Member member;
-  private String title;
-  private String description;
   private final String url;
   private final List<Ingredient> ingredients;
 
   @Builder
-  public Contents(
-      Member member, String title, String description, String url, List<Ingredient> ingredients) {
+  public Contents(Member member, String url, List<Ingredient> ingredients) {
     this.member = member;
-    this.title = title;
-    this.description = description;
     this.url = url;
     this.ingredients = ingredients;
   }
