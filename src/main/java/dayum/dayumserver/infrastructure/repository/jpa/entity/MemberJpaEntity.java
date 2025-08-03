@@ -1,16 +1,8 @@
 package dayum.dayumserver.infrastructure.repository.jpa.entity;
 
 import dayum.dayumserver.infrastructure.repository.jpa.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "members")
@@ -23,12 +15,31 @@ public class MemberJpaEntity extends BaseEntity {
   @Column(name = "member_id")
   private Long id;
 
+  @Column(nullable = false, unique = true)
+  private String email;
+
+  private String name;
+
   private String nickname;
 
-  // TODO: After finalizing the ERD, add the remaining column details.
+  private String profileImage;
+
+  @Column(nullable = false)
+  private String loginType; // NAVER, KAKAO 등
+
+  private String refreshToken;
 
   @Builder
-  public MemberJpaEntity(String nickname) {
+  public MemberJpaEntity(String email, String name, String nickname, String profileImage, String loginType, String refreshToken) {
+    this.email = email;
+    this.name = name;
     this.nickname = nickname;
+    this.profileImage = profileImage;
+    this.loginType = loginType;
+    this.refreshToken = refreshToken;
+  }
+
+  public void updateRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
   }
 }
