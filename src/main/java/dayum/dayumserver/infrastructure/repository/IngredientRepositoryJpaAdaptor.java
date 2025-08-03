@@ -18,6 +18,7 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
 
   @Override
   public List<Ingredient> search(String keyword) {
+    // TODO(chanjun.park): Update it after finalizing the ingredient search policy
     return ingredientJpaRepository.findAllByNameLike("%" + keyword + "%", Limit.of(10)).stream()
         .map(ingredientMapper::mapToDomainEntity)
         .toList();
