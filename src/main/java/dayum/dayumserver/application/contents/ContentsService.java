@@ -13,18 +13,20 @@ public class ContentsService {
 
   private final ContentsRepository contentsRepository;
 
-  public PageResponse<ContentsResponse> retrieveNextPage(long cursorId, int size) {
+  public PageResponse<ContentsResponse> retrieveNextPage(Long memberId, long cursorId, int size) {
     var contentsList =
-        contentsRepository.fetchNextPage(cursorId, size + 1).stream()
-            .map(ContentsResponse::from)
-            .toList();
+        switch (memberId) {
+          case null -> contentsRepository.fetchNextPage(cursorId, size + 1);
+          default -> contentsRepository.fetchNextPageByMember(memberId, cursorId, size + 1);
+        };
 
     if (contentsList.size() <= size) {
-      return new PageResponse<>(contentsList, new PageResponse.PageInfo("", true));
+      var items = contentsList.stream().map(ContentsResponse::from).toList();
+      return new PageResponse<>(items, new PageResponse.PageInfo("", true));
     }
-    var items = contentsList.subList(0, size);
+    var items = contentsList.subList(0, size).stream().map(ContentsResponse::from).toList();
     return new PageResponse<>(
-        items, new PageResponse.PageInfo(String.valueOf(contentsList.getLast().id()), false));
+        items, new PageResponse.PageInfo(String.valueOf(items.getLast().id()), false));
   }
 
   public ContentsDetailResponse retrieve(long id) {

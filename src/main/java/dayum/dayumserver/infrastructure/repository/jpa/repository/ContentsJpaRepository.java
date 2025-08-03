@@ -12,6 +12,16 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
 
   @Query(
       "SELECT contents "
+          + "FROM ContentsJpaEntity contents " 
+          + "JOIN FETCH contents.member "
+          + "WHERE contents.member.id = :memberId "
+          + "AND contents.id >= :cursorId "
+          + "ORDER BY contents.id "
+          + "LIMIT :size")
+  List<ContentsJpaEntity> findNextPageByMember(@Param("memberId") long memberId, @Param("cursorId") long cursorId, @Param("size") int size);
+
+  @Query(
+      "SELECT contents "
           + "FROM ContentsJpaEntity contents "
           + "WHERE contents.id >= :cursorId "
           + "ORDER BY contents.id "
