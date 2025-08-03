@@ -3,7 +3,6 @@ package dayum.dayumserver.application.contents.dto;
 import dayum.dayumserver.domain.contents.Contents;
 import java.time.LocalDateTime;
 
-// TODO(chanjun.park): Add fields for nutritional information
 public record ContentsDetailResponse(
     long id,
     long memberId,
