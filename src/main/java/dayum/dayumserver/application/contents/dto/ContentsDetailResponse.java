@@ -10,6 +10,10 @@ public record ContentsDetailResponse(
     String memberNickname,
     String thumbnailUrl,
     String url,
+    double calories,
+    double carbohydrates,
+    double proteins,
+    double fats,
     LocalDateTime uploadedAt) {
 
   public static ContentsDetailResponse from(Contents contents) {
@@ -19,6 +23,10 @@ public record ContentsDetailResponse(
         contents.member().nickname(),
         contents.url(),
         contents.thumbnailUrl(),
+        contents.calculateCalories(),
+        contents.calculateCarbohydrates(),
+        contents.calculateProteins(),
+        contents.calculateFats(),
         contents.createdAt());
   }
 }
