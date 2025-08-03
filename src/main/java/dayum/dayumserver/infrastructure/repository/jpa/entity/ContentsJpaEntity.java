@@ -30,7 +30,10 @@ public class ContentsJpaEntity extends BaseEntity {
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "member_id", referencedColumnName = "member_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+  @JoinColumn(
+      name = "member_id",
+      referencedColumnName = "member_id",
+      foreignKey = @ForeignKey(NO_CONSTRAINT))
   private MemberJpaEntity member;
 
   private String title;
