@@ -2,9 +2,9 @@ package dayum.dayumserver.application.contents.dto;
 
 import dayum.dayumserver.domain.contents.Contents;
 
-public record ContentsResponse(long id, String url) {
+public record ContentsResponse(long id, String thumbnailUrl, String url) {
 
   public static ContentsResponse from(Contents contents) {
-    return new ContentsResponse(contents.id(), contents.url());
+    return new ContentsResponse(contents.id(), contents.thumbnailUrl(), contents.url());
   }
 }

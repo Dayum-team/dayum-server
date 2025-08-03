@@ -38,13 +38,15 @@ public class ContentsJpaEntity extends BaseEntity {
 
   private String title;
   private String description;
+  private String thumbnailUrl;
   private String url;
 
   @Builder
-  public ContentsJpaEntity(MemberJpaEntity member, String title, String description, String url) {
+  public ContentsJpaEntity(MemberJpaEntity member, String title, String description, String thumbnailUrl, String url) {
     this.member = member;
     this.title = title;
     this.description = description;
+    this.thumbnailUrl = thumbnailUrl;
     this.url = url;
   }
 }
