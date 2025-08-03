@@ -55,6 +55,9 @@ spring:
       on-profile: prod
     import: 'aws-secretsmanager:dayum/server/prod'
 
+  jpa:
+    hibernate:
+      ddl-auto: validate
   datasource:
     url: jdbc:mysql://${mysql.host}:${mysql.port}/dayum
     username: ${mysql.username}
