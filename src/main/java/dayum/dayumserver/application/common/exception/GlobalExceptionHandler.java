@@ -1,11 +1,11 @@
-package dayum.dayumserver.common.exception;
+package dayum.dayumserver.application.common.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import dayum.dayumserver.common.response.ErrorResponse;
+import dayum.dayumserver.application.common.response.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

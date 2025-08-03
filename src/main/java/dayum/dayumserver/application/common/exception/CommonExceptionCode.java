@@ -1,4 +1,4 @@
-package dayum.dayumserver.common.exception;
+package dayum.dayumserver.application.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

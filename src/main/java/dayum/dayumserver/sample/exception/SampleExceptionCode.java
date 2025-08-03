@@ -2,7 +2,7 @@ package dayum.dayumserver.sample.exception;
 
 import org.springframework.http.HttpStatus;
 
-import dayum.dayumserver.common.exception.AppExceptionCode;
+import dayum.dayumserver.application.common.exception.AppExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
