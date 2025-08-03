@@ -1,3 +1,8 @@
 package dayum.dayumserver.domain.contents;
 
-public interface ContentsRepository {}
+import java.util.List;
+
+public interface ContentsRepository {
+
+  List<Contents> fetchNextPage(long cursorId, int size);
+}
