@@ -12,7 +12,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,14 +39,24 @@ public class ContentsJpaEntity extends BaseEntity {
       foreignKey = @ForeignKey(NO_CONSTRAINT))
   private MemberJpaEntity member;
 
+  @OneToMany(mappedBy = "contents", fetch = FetchType.LAZY)
+  private List<ContentsIngredientJpaEntity> ingredients = new ArrayList<>();
+
   private String title;
   private String description;
   private String thumbnailUrl;
   private String url;
 
   @Builder
-  public ContentsJpaEntity(MemberJpaEntity member, String title, String description, String thumbnailUrl, String url) {
+  public ContentsJpaEntity(
+      MemberJpaEntity member,
+      List<ContentsIngredientJpaEntity> ingredients,
+      String title,
+      String description,
+      String thumbnailUrl,
+      String url) {
     this.member = member;
+    this.ingredients = ingredients;
     this.title = title;
     this.description = description;
     this.thumbnailUrl = thumbnailUrl;
