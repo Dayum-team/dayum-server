@@ -14,23 +14,19 @@ public class MemberService {
     private final MemberJpaRepository memberJpaRepository;
 
     // 1. 로그인 또는 자동 회원가입
-    public MemberJpaEntity loginOrRegister(NaverUser user) {
+    public MemberJpaEntity loginOrRegister(NaverUser user, String nickname, String profileImage, String introduce) {
         return memberJpaRepository.findByEmail(user.email())
                 .orElseGet(() -> memberJpaRepository.save(MemberJpaEntity.builder()
                         .email(user.email())
                         .name(user.name())
-                        .nickname(user.name())  // 기본값으로 이름 사용
-                        .profileImage(user.profileImage())
+                        .nickname(nickname)
+                        .profileImage(profileImage)
                         .loginType("NAVER")
-                        .refreshToken(null)
+                        .introduce(introduce)
                         .build()));
     }
 
-    // 2. refresh 토큰 저장
-    public void updateRefreshToken(Long memberId, String refreshToken) {
-        MemberJpaEntity member = memberJpaRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        member.updateRefreshToken(refreshToken);
-        memberJpaRepository.save(member);
+    public boolean isNicknameDuplicated(String nickname) {
+        return memberJpaRepository.existsByNickname(nickname);
     }
 }
