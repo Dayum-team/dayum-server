@@ -1,5 +1,5 @@
 package dayum.dayumserver.application.contents.dto;
 
-public record ContentsTempResponse (){
+public record ContentsAnalyzeResponse(){
 
 }
