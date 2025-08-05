@@ -2,9 +2,10 @@ package dayum.dayumserver.application.member;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,14 +15,19 @@ public class JwtProvider {
   private String secret;
 
   private Key secretKey;
-  private final long accessTokenValidity = 1000L * 60 * 30; // 30분
-  private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 7; // 7일
+  private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 30;
+  private static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;
+
+  @PostConstruct
+  public void init() {
+    this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+  }
 
   public String createToken(String email) {
     return Jwts.builder()
         .setSubject(email)
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
+        .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
         .signWith(secretKey, SignatureAlgorithm.HS256)
         .compact();
   }
@@ -30,7 +36,7 @@ public class JwtProvider {
     return Jwts.builder()
         .setSubject(email)
         .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
+        .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
         .signWith(secretKey, SignatureAlgorithm.HS256)
         .compact();
   }

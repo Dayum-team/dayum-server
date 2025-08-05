@@ -1,5 +1,7 @@
 package dayum.dayumserver.application.member;
 
+import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +16,13 @@ public class MemberController {
   private final MemberService memberService;
 
   @GetMapping("/nickname/duplication")
-  public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+  public ResponseEntity<List<String>> checkNickname(@RequestParam String nickname) {
     boolean isDuplicated = memberService.isNicknameDuplicated(nickname);
-    return ResponseEntity.ok(isDuplicated); // true면 중복
+
+    if (isDuplicated) {
+      return ResponseEntity.ok(List.of(nickname));
+    } else {
+      return ResponseEntity.ok(Collections.emptyList());
+    }
   }
 }

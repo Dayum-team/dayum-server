@@ -7,7 +7,6 @@ spring:
     name: dayum-server
   profiles:
     active: local
-
   cloud.aws:
     region:
       static: ap-northeast-2
@@ -33,6 +32,8 @@ ncp:
   secret-key: ${ncp.secret-key}
   s3-endpoint: https://kr.object.ncloudstorage.com
 
+jwt:
+  secret: ${jwt.secret}
 ---
 spring:
   config:
@@ -49,6 +50,8 @@ spring:
 ncp:
   s3-bucket: dayum2-dev
 
+jwt:
+  secret: ${jwt.secret}
 ---
 spring:
   config:
@@ -67,3 +70,6 @@ spring:
 
 ncp:
   s3-bucket: dayum2-prod
+
+jwt:
+  secret: ${jwt.secret}
