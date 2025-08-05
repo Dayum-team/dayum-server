@@ -2,11 +2,15 @@ package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.response.ApiResponse;
 import dayum.dayumserver.application.common.response.PageResponse;
+import dayum.dayumserver.application.contents.dto.ContentsAnalyzeRequest;
+import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,5 +35,12 @@ public class ContentsController {
   public ApiResponse<ContentsDetailResponse> retrieveContents(@PathVariable long id) {
     var contents = contentsService.retrieve(id);
     return ApiResponse.of(contents);
+  }
+
+  @PostMapping
+  public ApiResponse<ContentsAnalyzeResponse> analyzeContents(
+      @RequestBody ContentsAnalyzeRequest request) {
+    var analyzeResponse = contentsService.extractIngredientsFromContent(request.contentsUrl());
+    return ApiResponse.of(analyzeResponse);
   }
 }
