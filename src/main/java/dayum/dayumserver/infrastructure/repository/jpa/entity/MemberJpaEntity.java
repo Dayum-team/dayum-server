@@ -27,23 +27,29 @@ public class MemberJpaEntity extends BaseEntity {
   @Column(nullable = false)
   private String loginType; // NAVER, KAKAO 등
 
-//  private String refreshToken;
+  //  private String refreshToken;
 
   @Column(length = 1000)
   private String introduce;
 
   @Builder
-  public MemberJpaEntity(String email, String name, String nickname, String profileImage, String loginType,  String introduce) {
+  public MemberJpaEntity(
+      String email,
+      String name,
+      String nickname,
+      String profileImage,
+      String loginType,
+      String introduce) {
     this.email = email;
     this.name = name;
     this.nickname = nickname;
     this.profileImage = profileImage;
     this.loginType = loginType;
-//    this.refreshToken = refreshToken;
+    //    this.refreshToken = refreshToken;
     this.introduce = introduce;
   }
 
-//  public void updateRefreshToken(String refreshToken) {
-//    this.refreshToken = refreshToken;
-//  }
+  //  public void updateRefreshToken(String refreshToken) {
+  //    this.refreshToken = refreshToken;
+  //  }
 }

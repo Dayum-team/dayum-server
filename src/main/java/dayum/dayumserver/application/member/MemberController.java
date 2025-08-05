@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberService memberService;
+  private final MemberService memberService;
 
-    @GetMapping("/nickname-duplication")
-    public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
-        boolean isDuplicated = memberService.isNicknameDuplicated(nickname);
-        return ResponseEntity.ok(isDuplicated); // true면 중복
-    }
+  @GetMapping("/nickname-duplication")
+  public ResponseEntity<Boolean> checkNickname(@RequestParam String nickname) {
+    boolean isDuplicated = memberService.isNicknameDuplicated(nickname);
+    return ResponseEntity.ok(isDuplicated); // true면 중복
+  }
 }
