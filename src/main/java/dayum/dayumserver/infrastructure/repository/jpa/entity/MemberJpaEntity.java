@@ -1,5 +1,6 @@
 package dayum.dayumserver.infrastructure.repository.jpa.entity;
 
+import dayum.dayumserver.domain.member.Oauth2Provider;
 import dayum.dayumserver.infrastructure.repository.jpa.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +16,7 @@ public class MemberJpaEntity extends BaseEntity {
   @Column(name = "member_id")
   private Long id;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String email;
 
   private String name;
@@ -24,13 +25,12 @@ public class MemberJpaEntity extends BaseEntity {
 
   private String profileImage;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private String loginType; // NAVER, KAKAO 등
-
-  //  private String refreshToken;
+  private Oauth2Provider oauth2Provider;
 
   @Column(length = 1000)
-  private String introduce;
+  private String bio;
 
   @Builder
   public MemberJpaEntity(
@@ -38,18 +38,13 @@ public class MemberJpaEntity extends BaseEntity {
       String name,
       String nickname,
       String profileImage,
-      String loginType,
-      String introduce) {
+      Oauth2Provider oauth2Provider,
+      String bio) {
     this.email = email;
     this.name = name;
     this.nickname = nickname;
     this.profileImage = profileImage;
-    this.loginType = loginType;
-    //    this.refreshToken = refreshToken;
-    this.introduce = introduce;
+    this.oauth2Provider = oauth2Provider;
+    this.bio = bio;
   }
-
-  //  public void updateRefreshToken(String refreshToken) {
-  //    this.refreshToken = refreshToken;
-  //  }
 }

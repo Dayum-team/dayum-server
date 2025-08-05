@@ -1,4 +1,4 @@
-package dayum.dayumserver.application.member;
+package dayum.dayumserver.client.s3.oauth2.naver;
 
 import dayum.dayumserver.application.member.dto.NaverUser;
 import java.util.Map;

@@ -31,8 +31,6 @@ dependencies {
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager:3.1.0'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.0'
 
-    implementation 'mysql:mysql-connector-java:8.0.33'
-
     // Persistence
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -52,6 +50,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    implementation "com.google.googlejavaformat:google-java-format:1.22.0"
 }
 
 tasks.named('test') {

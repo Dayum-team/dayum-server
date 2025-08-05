@@ -4,13 +4,16 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import lombok.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtProvider {
 
-  private final Key secretKey =
-      Keys.hmacShaKeyFor("dayum-super-secret-key-please-change-this".getBytes());
+  @Value("${jwt.secret}")
+  private String secret;
+
+  private Key secretKey;
   private final long accessTokenValidity = 1000L * 60 * 30; // 30분
   private final long refreshTokenValidity = 1000L * 60 * 60 * 24 * 7; // 7일
 
