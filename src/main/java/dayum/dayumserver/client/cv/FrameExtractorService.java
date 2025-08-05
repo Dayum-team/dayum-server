@@ -21,9 +21,11 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FrameExtractorService {
 
-  private static final int FRAME_EXTRACTION_INTERVAL_SECONDS = 3; // 몇 초마다 프레임을 추출할지
+  private static final int FRAME_EXTRACTION_INTERVAL_SECONDS = 3;
   private static final String FRAME_FILE_PREFIX = "frame-";
   private static final String FRAME_FILE_EXTENSION = "png";
+
+  private final Java2DFrameConverter converter = new Java2DFrameConverter();
 
   public List<File> extractFrames(File videoFile, Path workingDir) {
     List<File> frameFiles = new ArrayList<>();
@@ -32,11 +34,9 @@ public class FrameExtractorService {
       grabber.start();
 
       double frameRate = grabber.getFrameRate();
-      Java2DFrameConverter converter = new Java2DFrameConverter();
       Frame frame;
       int frameCount = 0;
 
-      // 프레임 추출 간격 계산
       int frameInterval = (int) Math.round(frameRate * FRAME_EXTRACTION_INTERVAL_SECONDS);
 
       while ((frame = grabber.grabImage()) != null) {
@@ -54,8 +54,6 @@ public class FrameExtractorService {
         }
         frameCount++;
       }
-
-      log.info("총 {}개의 프레임 추출 완료 ({}초 간격)", frameFiles.size(), FRAME_EXTRACTION_INTERVAL_SECONDS);
       return frameFiles;
 
     } catch (IOException e) {
