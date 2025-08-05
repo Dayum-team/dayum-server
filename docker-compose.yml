@@ -5,9 +5,9 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
-      MYSQL_DATABASE: ${DB_NAME:-dayum_db}
-      MYSQL_USER: ${DB_USERNAME:-dayum_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-dayum_password}
+      MYSQL_DATABASE: ${DB_NAME:-dayum2}
+      MYSQL_USER: ${DB_USERNAME:-dayum2}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-dayum2_password}
     ports:
       - "${DB_PORT:-3306}:3306"
     volumes:
