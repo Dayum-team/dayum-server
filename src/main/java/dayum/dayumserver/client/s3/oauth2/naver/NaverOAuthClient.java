@@ -1,6 +1,6 @@
 package dayum.dayumserver.client.s3.oauth2.naver;
 
-import dayum.dayumserver.application.member.dto.NaverUser;
+import dayum.dayumserver.application.member.dto.OAuthUserInfo;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -15,7 +15,7 @@ public class NaverOAuthClient {
 
   private final RestTemplate restTemplate = new RestTemplate();
 
-  public NaverUser getUserInfo(String accessToken) {
+  public OAuthUserInfo getUserInfo(String accessToken) {
     HttpHeaders headers = new HttpHeaders();
     headers.set("Authorization", "Bearer " + accessToken);
 
@@ -36,6 +36,6 @@ public class NaverOAuthClient {
     String name = (String) responseData.get("name");
     String profileImage = (String) responseData.get("profile_image");
 
-    return new NaverUser(email, name, profileImage);
+    return new OAuthUserInfo(email, name, profileImage);
   }
 }

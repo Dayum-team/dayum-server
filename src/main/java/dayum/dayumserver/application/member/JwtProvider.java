@@ -23,18 +23,18 @@ public class JwtProvider {
     this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
   }
 
-  public String createToken(String email) {
+  public String createToken(long id) {
     return Jwts.builder()
-        .setSubject(email)
+        .setSubject(String.valueOf(id))
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
         .signWith(secretKey, SignatureAlgorithm.HS256)
         .compact();
   }
 
-  public String createRefreshToken(String email) {
+  public String createRefreshToken(long id) {
     return Jwts.builder()
-        .setSubject(email)
+        .setSubject(String.valueOf(id))
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
         .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -66,5 +66,15 @@ public class JwtProvider {
         .parseClaimsJws(token)
         .getBody()
         .getExpiration();
+  }
+
+  public Long getMemberId(String token) {
+    return Long.valueOf(
+        Jwts.parserBuilder()
+            .setSigningKey(secretKey)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject());
   }
 }

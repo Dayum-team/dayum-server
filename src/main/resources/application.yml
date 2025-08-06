@@ -50,8 +50,6 @@ spring:
 ncp:
   s3-bucket: dayum2-dev
 
-jwt:
-  secret: ${jwt.secret}
 ---
 spring:
   config:
@@ -70,6 +68,3 @@ spring:
 
 ncp:
   s3-bucket: dayum2-prod
-
-jwt:
-  secret: ${jwt.secret}

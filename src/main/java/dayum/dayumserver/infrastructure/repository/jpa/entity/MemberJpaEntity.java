@@ -3,6 +3,7 @@ package dayum.dayumserver.infrastructure.repository.jpa.entity;
 import dayum.dayumserver.domain.member.Oauth2Provider;
 import dayum.dayumserver.infrastructure.repository.jpa.BaseEntity;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 
 @Entity
@@ -25,6 +26,10 @@ public class MemberJpaEntity extends BaseEntity {
 
   private String profileImage;
 
+  private LocalDateTime deletedAt;
+
+  private boolean deleted;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Oauth2Provider oauth2Provider;
@@ -34,17 +39,23 @@ public class MemberJpaEntity extends BaseEntity {
 
   @Builder
   public MemberJpaEntity(
+      Long id,
       String email,
       String name,
       String nickname,
       String profileImage,
       Oauth2Provider oauth2Provider,
-      String bio) {
+      String bio,
+      LocalDateTime deletedAt,
+      boolean deleted) {
+    this.id = id;
     this.email = email;
     this.name = name;
     this.nickname = nickname;
     this.profileImage = profileImage;
     this.oauth2Provider = oauth2Provider;
     this.bio = bio;
+    this.deletedAt = deletedAt;
+    this.deleted = deleted;
   }
 }
