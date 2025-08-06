@@ -32,6 +32,9 @@ ncp:
   access-key: ${ncp.access-key}
   secret-key: ${ncp.secret-key}
   s3-endpoint: https://kr.object.ncloudstorage.com
+  speech:
+    base-url: ${ncp.speech.base-url}
+    secret-key: ${ncp.speech.secret-key}
 
 ---
 spring:
