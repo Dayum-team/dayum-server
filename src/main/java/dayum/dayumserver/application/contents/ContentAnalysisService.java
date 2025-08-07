@@ -48,11 +48,9 @@ public class ContentAnalysisService {
       List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
 
       String ocrTexts = ocrService.extractTextFromFiles(frameFiles);
-      log.info("OCR texts extracted: {}", ocrTexts.toString());
 
       NcpSpeechRecognizeResponse ncpSpeechRecognizeResponse =
           ncpSpeechClient.recognize(contentsUrl);
-      log.info("NCP Speech Recognize Response: {}", ncpSpeechRecognizeResponse.fullText());
 
       return extractIngredientsWithAI(ocrTexts, ncpSpeechRecognizeResponse.fullText());
 
