@@ -5,11 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +25,7 @@ public class OcrService {
 
   private static final int MAX_CONCURRENT_REQUESTS = 5;
 
-  private final RestTemplate restTemplate;
+  private final RestClient restClient;
 
   private final ExecutorService ocrThreadPool =
       Executors.newFixedThreadPool(MAX_CONCURRENT_REQUESTS);
@@ -96,12 +94,14 @@ public class OcrService {
             "lang", "ko",
             "images", List.of(Map.of("format", "png", "name", file.getName(), "data", base64Data)));
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.set("X-OCR-SECRET", ocrSecretKey);
-
-    HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-    return restTemplate.postForObject(ocrApiUrl, request, OcrResponse.class);
+    return restClient
+        .post()
+        .uri(ocrApiUrl)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header("X-OCR-SECRET", ocrSecretKey)
+        .body(requestBody)
+        .retrieve()
+        .body(OcrResponse.class);
   }
 
   private String parseTextFromResponse(OcrResponse response) {
