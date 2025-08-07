@@ -47,7 +47,7 @@ public class ContentsService {
 
     var contents = saveContentsAsPending(memberId, contentsUrl);
 
-    List<ExtractedIngredientData> analysisResult =
+    // List<ExtractedIngredientData> analysisResult =
         contentAnalysisService.analyzeIngredients(contentsUrl);
 
     // TODO 추출된 재료와 DB 데이터 매핑후 반환
