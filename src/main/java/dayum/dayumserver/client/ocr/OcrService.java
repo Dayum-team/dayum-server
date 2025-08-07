@@ -1,6 +1,9 @@
 package dayum.dayumserver.client.ocr;
 
+import dayum.dayumserver.application.common.exception.AppException;
+import dayum.dayumserver.application.common.exception.CommonExceptionCode;
 import dayum.dayumserver.client.s3.NcpProperties;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -14,7 +17,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Component
@@ -24,10 +28,16 @@ public class OcrService {
 
   private static final int MAX_CONCURRENT_REQUESTS = 5;
 
-  private final Semaphore semaphore = new Semaphore(MAX_CONCURRENT_REQUESTS);
-
   private final NcpProperties ncpProperties;
   private final RestTemplate restTemplate;
+
+  private final ExecutorService ocrThreadPool =
+      Executors.newFixedThreadPool(MAX_CONCURRENT_REQUESTS);
+
+  @PreDestroy
+  public void shutdown() {
+    ocrThreadPool.shutdown();
+  }
 
   /** 파일별 OCR 결과를 Map으로 반환 */
   public Map<String, String> extractTextFromFiles(List<File> files) {
@@ -43,7 +53,8 @@ public class OcrService {
                         () -> {
                           String text = extractTextFromFile(file);
                           return Map.entry(file.getName(), text);
-                        }))
+                        },
+                        ocrThreadPool))
             .collect(Collectors.toList());
 
     return futures.stream()
@@ -61,13 +72,8 @@ public class OcrService {
 
   private String extractTextFromFile(File file) {
     try {
-      semaphore.acquire();
-      try {
-        OcrResponse response = callOcrApi(file);
-        return parseTextFromResponse(response);
-      } finally {
-        semaphore.release();
-      }
+      OcrResponse response = callOcrApi(file);
+      return parseTextFromResponse(response);
     } catch (Exception e) {
       return "";
     }

@@ -16,6 +16,8 @@ public enum CommonExceptionCode implements AppExceptionCode {
 
   FILE_ENCODING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FL_001", "파일 인코딩 중 서버 내부 오류가 발생했습니다."),
 
+  OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "O_001", "OCR 처리 중 오류가 발생했습니다."),
+
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S_001", "서버 내부 오류가 발생했습니다.");
 
   private final HttpStatus status;

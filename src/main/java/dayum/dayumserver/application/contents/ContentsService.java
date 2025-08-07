@@ -16,6 +16,7 @@ import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
+import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.client.cv.FrameExtractorService;
 import dayum.dayumserver.client.ocr.OcrService;
 import dayum.dayumserver.client.s3.S3ClientService;
@@ -56,7 +57,11 @@ public class ContentsService {
 
   public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl) {
 
-    Map<String, Object> analysisResult = contentAnalysisService.analyzeIngredients(contentsUrl);
+    //TODO DB에 contents status pending상태로 memberId + contentsURL 저장
+
+    List<ExtractedIngredientData> analysisResult = contentAnalysisService.analyzeIngredients(contentsUrl);
+
+    //TODO 추출된 재료와 DB 데이터 매핑후 반환
 
     return new ContentsAnalyzeResponse();
   }

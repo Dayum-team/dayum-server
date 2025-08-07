@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import dayum.dayumserver.application.common.exception.AppException;
 import dayum.dayumserver.application.common.exception.CommonExceptionCode;
+import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.client.cv.FrameExtractorService;
 import dayum.dayumserver.client.ocr.OcrService;
 import dayum.dayumserver.client.s3.S3ClientService;
@@ -29,7 +30,7 @@ public class ContentAnalysisService {
   private final FrameExtractorService frameExtractorService;
   private final OcrService ocrService;
 
-  public Map<String, Object> analyzeIngredients(String contentsUrl) {
+  public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
     Path workingDir = createWorkingDirectory();
 
     try {
@@ -56,9 +57,9 @@ public class ContentAnalysisService {
     }
   }
 
-  private Map<String, Object> extractIngredientsWithAI(Map<String, String> ocrTexts) {
+  private List<ExtractedIngredientData> extractIngredientsWithAI(Map<String, String> ocrTexts) {
     // Clova Studio 로직 추가 예정
-    return Map.of();
+    return null;
   }
 
   private void deleteWorkingDirectory(Path path) {
