@@ -31,10 +31,7 @@ import org.springframework.stereotype.Service;
 public class ContentsService {
 
   private final ContentsRepository contentsRepository;
-
-  private final S3ClientService s3ClientService;
-  private final FrameExtractorService frameExtractorService;
-  private final OcrService ocrService;
+  private final ContentAnalysisService contentAnalysisService;
 
   public PageResponse<ContentsResponse> retrieveNextPage(Long memberId, long cursorId, int size) {
     var contentsList =
@@ -58,42 +55,9 @@ public class ContentsService {
   }
 
   public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl) {
-    String uniqueId = UUID.randomUUID().toString();
-    Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), uniqueId);
 
-    File downloadedFile = null;
-    List<File> frameFiles = null;
-    try {
-      // 워킹 디렉토리 생성
-      Files.createDirectory(workingDir);
-      // 1. ncp object storage 에서 영상 다운로드
-      downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
-      // 2. 영상을 JavaCV(FFmpegFrameGrabber) 로 이미지 추출
-      frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
-      // // 3. NCP OCR 로 자막 데이터 추출
-      Map<String, String> ocrExtractText = ocrService.extractTextFromFiles(frameFiles);
-      // 4. "자막 + 이미지" 를 묶어서 NCP CLOVA Studio HXR-005 모델로 식재료 추출 요청
-
-      // 5. 추출된 식재료를 데이터베이스에서 조회
-      // 6. DB에 존재하는 식재료로 응답
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    } finally {
-      // 식재료 추출 작업이 끝나면 작업동안 생긴 폴더를 제거
-      if (workingDir != null && Files.exists(workingDir)) {
-		  deleteDirectoryRecursively(workingDir);
-	  }
-    }
+    Map<String, Object> analysisResult = contentAnalysisService.analyzeIngredients(contentsUrl);
 
     return new ContentsAnalyzeResponse();
-  }
-
-  private void deleteDirectoryRecursively(Path path) {
-	  try {
-		  Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-	  } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-	  }
   }
 }
