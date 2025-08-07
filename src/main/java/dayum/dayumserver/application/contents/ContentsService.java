@@ -25,8 +25,9 @@ public class ContentsService {
       return new PageResponse<>(items, new PageResponse.PageInfo("", true));
     }
     var items = contentsList.subList(0, size).stream().map(ContentsResponse::from).toList();
+    var nextItem = contentsList.getLast();
     return new PageResponse<>(
-        items, new PageResponse.PageInfo(String.valueOf(items.getLast().id()), false));
+        items, new PageResponse.PageInfo(String.valueOf(nextItem.id()), false));
   }
 
   public ContentsDetailResponse retrieve(long id) {
