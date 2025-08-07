@@ -17,7 +17,4 @@ public class NcpProperties {
   private String secretKey;
   private String s3Endpoint;
   private String s3Bucket;
-
-  private String ocrApiUrl;
-  private String ocrSecretKey;
 }

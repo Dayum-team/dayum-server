@@ -1,11 +1,10 @@
 package dayum.dayumserver.client.ocr;
 
-import dayum.dayumserver.application.common.exception.AppException;
-import dayum.dayumserver.application.common.exception.CommonExceptionCode;
-import dayum.dayumserver.client.s3.NcpProperties;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,11 +27,16 @@ public class OcrService {
 
   private static final int MAX_CONCURRENT_REQUESTS = 5;
 
-  private final NcpProperties ncpProperties;
   private final RestTemplate restTemplate;
 
   private final ExecutorService ocrThreadPool =
       Executors.newFixedThreadPool(MAX_CONCURRENT_REQUESTS);
+
+  @Value("${ncp.ocr.secret-key}")
+  private String ocrSecretKey;
+
+  @Value("${ncp.ocr.api-url}")
+  private String ocrApiUrl;
 
   @PreDestroy
   public void shutdown() {
@@ -75,6 +79,7 @@ public class OcrService {
       OcrResponse response = callOcrApi(file);
       return parseTextFromResponse(response);
     } catch (Exception e) {
+      log.info("OCR API call failed: {}", e.getMessage());
       return "";
     }
   }
@@ -93,10 +98,10 @@ public class OcrService {
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-    headers.set("X-OCR-SECRET", ncpProperties.getOcrSecretKey());
+    headers.set("X-OCR-SECRET", ocrSecretKey);
 
     HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
-    return restTemplate.postForObject(ncpProperties.getOcrApiUrl(), request, OcrResponse.class);
+    return restTemplate.postForObject(ocrApiUrl, request, OcrResponse.class);
   }
 
   private String parseTextFromResponse(OcrResponse response) {
