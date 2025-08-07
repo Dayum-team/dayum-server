@@ -40,14 +40,15 @@ public class ContentAnalysisService {
     Path workingDir = createWorkingDirectory();
 
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-      StructuredTaskScope.Subtask<String> ocrTask = scope.fork(() -> {
-        File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
-        List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
-        return ocrService.extractTextFromFiles(frames);
-      });
-      StructuredTaskScope.Subtask<String> recognizeSpeechTask = scope.fork(() ->
-          ncpSpeechClient.recognize(contentsUrl).fullText()
-      );
+      StructuredTaskScope.Subtask<String> ocrTask =
+          scope.fork(
+              () -> {
+                File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
+                List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
+                return ocrService.extractTextFromFiles(frames);
+              });
+      StructuredTaskScope.Subtask<String> recognizeSpeechTask =
+          scope.fork(() -> ncpSpeechClient.recognize(contentsUrl).fullText());
 
       scope.join();
       scope.throwIfFailed();
@@ -72,9 +73,7 @@ public class ContentAnalysisService {
 
   private List<ExtractedIngredientData> extractIngredientsWithAI(
       String ocrTexts, String speechText) {
-    System.out.println(STR."ocrTexts = \{ocrTexts}, speechText = \{speechText}");
-    return parseIngredientsFromJson(
-        clovaService.extractIngredients(ocrTexts, speechText).toString());
+    return parseIngredientsFromJson(clovaService.extractIngredients(ocrTexts, speechText));
   }
 
   private void deleteWorkingDirectory(Path path) {
