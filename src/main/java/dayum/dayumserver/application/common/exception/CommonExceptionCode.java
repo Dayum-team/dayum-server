@@ -20,7 +20,7 @@ public enum CommonExceptionCode implements AppExceptionCode {
 
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S_001", "서버 내부 오류가 발생했습니다."),
 
-	BAD_REQUEST(HttpStatus.BAD_REQUEST, "C-REQUEST-002", "잘못된 요청입니다.");
+  BAD_REQUEST(HttpStatus.BAD_REQUEST, "C-REQUEST-002", "잘못된 요청입니다.");
 
   private final HttpStatus status;
   private final String code;
