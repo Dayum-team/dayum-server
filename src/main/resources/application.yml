@@ -36,6 +36,10 @@ ncp:
     base-url: ${ncp.speech.base-url}
     secret-key: ${ncp.speech.secret-key}
 
+  ocr:
+    secret-key: ${ncp.ocr.secret-key}
+    api-url: ${ncp.ocr.api-url}
+
 ---
 spring:
   config:
@@ -70,3 +74,4 @@ spring:
 
 ncp:
   s3-bucket: dayum2-prod
+
