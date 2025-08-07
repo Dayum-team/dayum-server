@@ -45,18 +45,14 @@ public class ContentsService {
 
   public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl, Long memberId) {
 
-    var contents = saveContentsAsPending(memberId, contentsUrl);
+    var contents = Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl);
+    contentsRepository.save(contents);
 
-    // List<ExtractedIngredientData> analysisResult =
+    List<ExtractedIngredientData> analysisResult =
         contentAnalysisService.analyzeIngredients(contentsUrl);
 
     // TODO 추출된 재료와 DB 데이터 매핑후 반환
 
     return new ContentsAnalyzeResponse();
-  }
-
-  private Contents saveContentsAsPending(Long memberId, String contentsUrl) {
-    return contentsRepository.save(
-        Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl));
   }
 }

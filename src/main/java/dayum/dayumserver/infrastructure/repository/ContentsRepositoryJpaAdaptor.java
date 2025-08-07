@@ -39,7 +39,7 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
     return contentsJpaRepository.findById(id).map(contentsMapper::mapToDomainEntity).orElseThrow();
   }
 
-  @Transactional(readOnly = false)
+  @Transactional
   @Override
   public Contents save(Contents contents) {
     return contentsMapper.mapToDomainEntity(

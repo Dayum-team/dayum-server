@@ -40,10 +40,6 @@ ncp:
     secret-key: ${ncp.ocr.secret-key}
     api-url: ${ncp.ocr.api-url}
 
-  ocr:
-    secret-key: ${ncp.ocr.secret-key}
-    api-url: ${ncp.ocr.api-url}
-
 ---
 spring:
   config:
