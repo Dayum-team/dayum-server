@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "members")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class MemberJpaEntity extends BaseEntity {
 
   @Id
@@ -26,9 +28,4 @@ public class MemberJpaEntity extends BaseEntity {
   private String nickname;
 
   // TODO: After finalizing the ERD, add the remaining column details.
-
-  @Builder
-  public MemberJpaEntity(String nickname) {
-    this.nickname = nickname;
-  }
 }

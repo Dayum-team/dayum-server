@@ -35,4 +35,11 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   public Contents fetchBy(long id) {
     return contentsJpaRepository.findById(id).map(contentsMapper::mapToDomainEntity).orElseThrow();
   }
+
+  @Transactional(readOnly = false)
+  @Override
+  public Contents save(Contents contents) {
+    return contentsMapper.mapToDomainEntity(
+        contentsJpaRepository.save(contentsMapper.mapToJpaEntity(contents)));
+  }
 }

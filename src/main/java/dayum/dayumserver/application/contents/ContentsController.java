@@ -24,7 +24,7 @@ public class ContentsController {
 
   @GetMapping
   public ApiResponse<PageResponse<ContentsResponse>> retrieveAllContents(
-      @RequestParam(value = "member_id", required = false) Long memberId,
+      @RequestParam(value = "member_id", required = true) Long memberId,
       @RequestParam(value = "cursor", defaultValue = "0") long cursorId,
       @RequestParam(value = "size", defaultValue = "15") int size) {
     var contentsPage = contentsService.retrieveNextPage(memberId, cursorId, size);
@@ -40,7 +40,8 @@ public class ContentsController {
   @PostMapping
   public ApiResponse<ContentsAnalyzeResponse> analyzeContents(
       @RequestBody ContentsAnalyzeRequest request) {
-    var analyzeResponse = contentsService.extractIngredientsFromContent(request.contentsUrl());
+    var analyzeResponse =
+        contentsService.extractIngredientsFromContent(request.contentsUrl(), request.memberId());
     return ApiResponse.of(analyzeResponse);
   }
 }

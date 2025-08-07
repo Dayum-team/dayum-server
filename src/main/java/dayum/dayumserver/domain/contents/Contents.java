@@ -11,4 +11,10 @@ public record Contents(
     String thumbnailUrl,
     String url,
     List<Ingredient> ingredients,
-    LocalDateTime createdAt) {}
+    ContentStatus status,
+    LocalDateTime createdAt) {
+
+  public static Contents createDraft(Member member, String url) {
+    return new Contents(null, member, null, url, null, ContentStatus.PENDING, null);
+  }
+}
