@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum CommonExceptionCode implements AppExceptionCode {
-  REQUEST_BODY_MISSING(HttpStatus.BAD_REQUEST, "C-REQUEST-001", "필수 요청 본문(Request Body)이 누락되었습니다."),
+  REQUEST_BODY_MISSING(HttpStatus.BAD_REQUEST, "C_001", "필수 요청 본문(Request Body)이 누락되었습니다."),
 
   S3_DOWNLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3_001", "파일 다운로드 중 서버 내부 오류가 발생했습니다."),
 
