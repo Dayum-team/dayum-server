@@ -63,9 +63,10 @@ public class ContentsService {
 
     var contents = saveContentsAsPending(memberId, contentsUrl);
 
-    List<ExtractedIngredientData> analysisResult = contentAnalysisService.analyzeIngredients(contentsUrl);
+    List<ExtractedIngredientData> analysisResult =
+        contentAnalysisService.analyzeIngredients(contentsUrl);
 
-    //TODO 추출된 재료와 DB 데이터 매핑후 반환
+    // TODO 추출된 재료와 DB 데이터 매핑후 반환
 
     return new ContentsAnalyzeResponse();
   }
@@ -74,5 +75,4 @@ public class ContentsService {
     return contentsRepository.save(
         Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl));
   }
-
 }
