@@ -38,19 +38,20 @@ public class ContentAnalysisService {
 
   public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
     Path workingDir = createWorkingDirectory();
+
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-      StructuredTaskScope.Subtask<String> ocrFuture = scope.fork(() -> {
+      StructuredTaskScope.Subtask<String> ocrTask = scope.fork(() -> {
         File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
         List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
         return ocrService.extractTextFromFiles(frames);
       });
-      StructuredTaskScope.Subtask<String> sttFuture = scope.fork(() ->
+      StructuredTaskScope.Subtask<String> recognizeSpeechTask = scope.fork(() ->
           ncpSpeechClient.recognize(contentsUrl).fullText()
       );
 
       scope.join();
       scope.throwIfFailed();
-      return extractIngredientsWithAI(ocrFuture.get(), sttFuture.get());
+      return extractIngredientsWithAI(ocrTask.get(), recognizeSpeechTask.get());
     } catch (Exception e) {
       throw new RuntimeException("Ingredient analysis failed", e);
     } finally {
