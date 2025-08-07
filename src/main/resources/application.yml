@@ -32,6 +32,10 @@ ncp:
   secret-key: ${ncp.secret-key}
   s3-endpoint: https://kr.object.ncloudstorage.com
 
+  ocr:
+    secret-key: ${ncp.ocr.secret-key}
+    api-url: ${ncp.ocr.api-url}
+
 ---
 spring:
   config:
@@ -66,3 +70,4 @@ spring:
 
 ncp:
   s3-bucket: dayum2-prod
+
