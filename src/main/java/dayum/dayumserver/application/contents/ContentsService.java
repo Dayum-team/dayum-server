@@ -16,6 +16,7 @@ import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
+import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.client.cv.FrameExtractorService;
 import dayum.dayumserver.client.ocr.OcrService;
 import dayum.dayumserver.client.s3.S3ClientService;
@@ -34,10 +35,7 @@ public class ContentsService {
 
   private final ContentsRepository contentsRepository;
   private final MemberRepository memberRepository;
-
-  private final S3ClientService s3ClientService;
-  private final FrameExtractorService frameExtractorService;
-  private final OcrService ocrService;
+  private final ContentAnalysisService contentAnalysisService;
 
   public PageResponse<ContentsResponse> retrieveNextPage(Long memberId, long cursorId, int size) {
     var contentsList =
@@ -51,8 +49,9 @@ public class ContentsService {
       return new PageResponse<>(items, new PageResponse.PageInfo("", true));
     }
     var items = contentsList.subList(0, size).stream().map(ContentsResponse::from).toList();
+    var nextItem = contentsList.getLast();
     return new PageResponse<>(
-        items, new PageResponse.PageInfo(String.valueOf(items.getLast().id()), false));
+        items, new PageResponse.PageInfo(String.valueOf(nextItem.id()), false));
   }
 
   public ContentsDetailResponse retrieve(long id) {
@@ -64,33 +63,9 @@ public class ContentsService {
 
     var contents = saveContentsAsPending(memberId, contentsUrl);
 
-    String uniqueId = UUID.randomUUID().toString();
-    Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), uniqueId);
+    List<ExtractedIngredientData> analysisResult = contentAnalysisService.analyzeIngredients(contentsUrl);
 
-    File downloadedFile = null;
-    List<File> frameFiles = null;
-    try {
-      // 워킹 디렉토리 생성
-      // Files.createDirectory(workingDir);
-      // // 1. ncp object storage 에서 영상 다운로드
-      // downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
-      // // 2. 영상을 JavaCV(FFmpegFrameGrabber) 로 이미지 추출
-      // frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
-      // // // 3. NCP OCR 로 자막 데이터 추출
-      // Map<String, String> ocrExtractText = ocrService.extractTextFromFiles(frameFiles);
-      // 4. "자막 + 이미지" 를 묶어서 NCP CLOVA Studio HXR-005 모델로 식재료 추출 요청
-
-      // 5. 추출된 식재료를 데이터베이스에서 조회
-      // 6. DB에 존재하는 식재료로 응답
-
-      // } catch (IOException e) {
-      //   throw new RuntimeException(e);
-    } finally {
-      // 식재료 추출 작업이 끝나면 작업동안 생긴 폴더를 제거
-      if (workingDir != null && Files.exists(workingDir)) {
-        deleteDirectoryRecursively(workingDir);
-      }
-    }
+    //TODO 추출된 재료와 DB 데이터 매핑후 반환
 
     return new ContentsAnalyzeResponse();
   }
@@ -100,11 +75,4 @@ public class ContentsService {
         Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl));
   }
 
-  private void deleteDirectoryRecursively(Path path) {
-    try {
-      Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
-  }
 }
