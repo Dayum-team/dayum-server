@@ -1,36 +1,20 @@
 package dayum.dayumserver.application.contents;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
-import dayum.dayumserver.application.common.exception.AppException;
-import dayum.dayumserver.application.common.exception.CommonExceptionCode;
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
-import dayum.dayumserver.client.cv.FrameExtractorService;
-import dayum.dayumserver.client.ocr.OcrService;
-import dayum.dayumserver.client.s3.S3ClientService;
 import dayum.dayumserver.domain.contents.Contents;
 import dayum.dayumserver.domain.contents.ContentsRepository;
 import dayum.dayumserver.domain.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ContentsService {
 
   private final ContentsRepository contentsRepository;

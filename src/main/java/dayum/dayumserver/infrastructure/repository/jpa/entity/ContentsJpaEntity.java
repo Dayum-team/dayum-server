@@ -2,6 +2,8 @@ package dayum.dayumserver.infrastructure.repository.jpa.entity;
 
 import static jakarta.persistence.ConstraintMode.*;
 
+import java.util.ArrayList;
+
 import dayum.dayumserver.domain.contents.ContentStatus;
 import dayum.dayumserver.infrastructure.repository.jpa.BaseEntity;
 import jakarta.persistence.Column;
@@ -15,10 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,7 +28,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "contents")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class ContentsJpaEntity extends BaseEntity {
 
   @Id
@@ -40,6 +41,9 @@ public class ContentsJpaEntity extends BaseEntity {
       referencedColumnName = "member_id",
       foreignKey = @ForeignKey(NO_CONSTRAINT))
   private MemberJpaEntity member;
+
+  @OneToMany(mappedBy = "contents", fetch = FetchType.LAZY)
+  private List<ContentsIngredientJpaEntity> ingredients = new ArrayList<>();
 
   private String title;
   private String description;

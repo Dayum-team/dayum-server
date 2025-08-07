@@ -25,12 +25,20 @@ spring:
       hibernate:
         format_sql: ${SPRING_JPA_FORMAT_SQL:false}
         dialect: org.hibernate.dialect.MySQLDialect
+        default_batch_fetch_size: 1000
 
 ncp:
   region: kr-standard
   access-key: ${ncp.access-key}
   secret-key: ${ncp.secret-key}
   s3-endpoint: https://kr.object.ncloudstorage.com
+  speech:
+    base-url: ${ncp.speech.base-url}
+    secret-key: ${ncp.speech.secret-key}
+
+  ocr:
+    secret-key: ${ncp.ocr.secret-key}
+    api-url: ${ncp.ocr.api-url}
 
   ocr:
     secret-key: ${ncp.ocr.secret-key}
@@ -70,3 +78,4 @@ spring:
 
 ncp:
   s3-bucket: dayum2-prod
+

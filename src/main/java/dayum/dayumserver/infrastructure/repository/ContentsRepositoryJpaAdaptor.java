@@ -6,6 +6,7 @@ import dayum.dayumserver.infrastructure.repository.jpa.repository.ContentsJpaRep
 import dayum.dayumserver.infrastructure.repository.mapper.ContentsMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,14 +20,16 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
 
   @Override
   public List<Contents> fetchNextPageByMember(long memberId, long cursorId, int size) {
-    return contentsJpaRepository.findNextPageByMember(memberId, cursorId, size).stream()
+    var page = PageRequest.of(0, size);
+    return contentsJpaRepository.findNextPageByMember(memberId, cursorId, page).stream()
         .map(contentsMapper::mapToDomainEntity)
         .toList();
   }
 
   @Override
   public List<Contents> fetchNextPage(long cursorId, int size) {
-    return contentsJpaRepository.findNextPage(cursorId, size).stream()
+    var page = PageRequest.of(0, size);
+    return contentsJpaRepository.findNextPage(cursorId, page).stream()
         .map(contentsMapper::mapToDomainEntity)
         .toList();
   }

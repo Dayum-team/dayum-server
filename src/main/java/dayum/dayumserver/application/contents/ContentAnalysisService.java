@@ -26,47 +26,47 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ContentAnalysisService {
 
-	private final S3ClientService s3ClientService;
-	private final FrameExtractorService frameExtractorService;
-	private final OcrService ocrService;
+  private final S3ClientService s3ClientService;
+  private final FrameExtractorService frameExtractorService;
+  private final OcrService ocrService;
 
-	public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
-		Path workingDir = createWorkingDirectory();
+  public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
+    Path workingDir = createWorkingDirectory();
 
-		try {
-			File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
-			List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
+    try {
+      File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
+      List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
 
-			Map<String, String> ocrTexts = ocrService.extractTextFromFiles(frameFiles);
-			log.info("OCR texts extracted: {}", ocrTexts.toString());
+      Map<String, String> ocrTexts = ocrService.extractTextFromFiles(frameFiles);
+      log.info("OCR texts extracted: {}", ocrTexts.toString());
 
-			return extractIngredientsWithAI(ocrTexts);
+      return extractIngredientsWithAI(ocrTexts);
 
-		} finally {
-			deleteWorkingDirectory(workingDir);
-		}
-	}
+    } finally {
+      deleteWorkingDirectory(workingDir);
+    }
+  }
 
-	private Path createWorkingDirectory() {
-		try {
-			Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-			Files.createDirectory(workingDir);
-			return workingDir;
-		} catch (IOException e) {
-			throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-		}
-	}
+  private Path createWorkingDirectory() {
+    try {
+      Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+      Files.createDirectory(workingDir);
+      return workingDir;
+    } catch (IOException e) {
+      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
+    }
+  }
 
-	private List<ExtractedIngredientData> extractIngredientsWithAI(Map<String, String> ocrTexts) {
-		// Clova Studio 로직 추가 예정
-		return null;
-	}
+  private List<ExtractedIngredientData> extractIngredientsWithAI(Map<String, String> ocrTexts) {
+    // Clova Studio 로직 추가 예정
+    return null;
+  }
 
-	private void deleteWorkingDirectory(Path path) {
-		try {
-			Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-		} catch (IOException e) {
-			throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-		}
-	}
+  private void deleteWorkingDirectory(Path path) {
+    try {
+      Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+    } catch (IOException e) {
+      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
