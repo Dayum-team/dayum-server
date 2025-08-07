@@ -18,9 +18,11 @@ import dayum.dayumserver.client.cv.FrameExtractorService;
 import dayum.dayumserver.client.ocr.OcrService;
 import dayum.dayumserver.client.s3.S3ClientService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ContentAnalysisService {
 
   private final S3ClientService s3ClientService;
@@ -28,14 +30,14 @@ public class ContentAnalysisService {
   private final OcrService ocrService;
 
   public Map<String, Object> analyzeIngredients(String contentsUrl) {
-    String uniqueId = UUID.randomUUID().toString();
-    Path workingDir = createWorkingDirectory(uniqueId);
+    Path workingDir = createWorkingDirectory();
 
     try {
       File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
       List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
 
       Map<String, String> ocrTexts = ocrService.extractTextFromFiles(frameFiles);
+      log.info("OCR texts extracted: {}", ocrTexts.toString());
 
       return extractIngredientsWithAI(ocrTexts);
 
@@ -44,9 +46,9 @@ public class ContentAnalysisService {
     }
   }
 
-  private Path createWorkingDirectory(String uniqueId) {
+  private Path createWorkingDirectory() {
     try {
-      Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), uniqueId);
+      Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
       Files.createDirectory(workingDir);
       return workingDir;
     } catch (IOException e) {
