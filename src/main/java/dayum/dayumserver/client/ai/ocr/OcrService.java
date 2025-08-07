@@ -1,4 +1,4 @@
-package dayum.dayumserver.client.ocr;
+package dayum.dayumserver.client.ai.ocr;
 
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;

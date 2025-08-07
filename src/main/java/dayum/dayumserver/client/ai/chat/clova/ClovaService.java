@@ -1,7 +1,5 @@
-package dayum.dayumserver.client.clova;
+package dayum.dayumserver.client.ai.chat.clova;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,9 +10,6 @@ import org.springframework.web.client.RestClientResponseException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor

@@ -1,5 +1,16 @@
 package dayum.dayumserver.application.contents;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dayum.dayumserver.application.common.exception.AppException;
+import dayum.dayumserver.application.common.exception.CommonExceptionCode;
+import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
+import dayum.dayumserver.client.ai.chat.clova.ClovaService;
+import dayum.dayumserver.client.ai.ocr.OcrService;
+import dayum.dayumserver.client.ai.speech.NcpSpeechClient;
+import dayum.dayumserver.client.cv.FrameExtractorService;
+import dayum.dayumserver.client.s3.S3ClientService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,26 +18,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dayum.dayumserver.application.common.exception.AppException;
-import dayum.dayumserver.application.common.exception.CommonExceptionCode;
-import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
-import dayum.dayumserver.client.ai.speech.NcpSpeechClient;
-import dayum.dayumserver.client.ai.speech.dto.NcpSpeechRecognizeResponse;
-import dayum.dayumserver.client.clova.ClovaService;
-import dayum.dayumserver.client.cv.FrameExtractorService;
-import dayum.dayumserver.client.ocr.OcrService;
-import dayum.dayumserver.client.s3.S3ClientService;
+import java.util.concurrent.StructuredTaskScope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -42,18 +38,21 @@ public class ContentAnalysisService {
 
   public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
     Path workingDir = createWorkingDirectory();
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+      StructuredTaskScope.Subtask<String> ocrFuture = scope.fork(() -> {
+        File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
+        List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
+        return ocrService.extractTextFromFiles(frames);
+      });
+      StructuredTaskScope.Subtask<String> sttFuture = scope.fork(() ->
+          ncpSpeechClient.recognize(contentsUrl).fullText()
+      );
 
-    try {
-      File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
-      List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
-
-      String ocrTexts = ocrService.extractTextFromFiles(frameFiles);
-
-      NcpSpeechRecognizeResponse ncpSpeechRecognizeResponse =
-          ncpSpeechClient.recognize(contentsUrl);
-
-      return extractIngredientsWithAI(ocrTexts, ncpSpeechRecognizeResponse.fullText());
-
+      scope.join();
+      scope.throwIfFailed();
+      return extractIngredientsWithAI(ocrFuture.get(), sttFuture.get());
+    } catch (Exception e) {
+      throw new RuntimeException("Ingredient analysis failed", e);
     } finally {
       deleteWorkingDirectory(workingDir);
     }
@@ -70,8 +69,11 @@ public class ContentAnalysisService {
     }
   }
 
-  private List<ExtractedIngredientData> extractIngredientsWithAI(String ocrTexts, String speechText) {
-    return parseIngredientsFromJson(clovaService.extractIngredients(ocrTexts, speechText).toString());
+  private List<ExtractedIngredientData> extractIngredientsWithAI(
+      String ocrTexts, String speechText) {
+    System.out.println(STR."ocrTexts = \{ocrTexts}, speechText = \{speechText}");
+    return parseIngredientsFromJson(
+        clovaService.extractIngredients(ocrTexts, speechText).toString());
   }
 
   private void deleteWorkingDirectory(Path path) {

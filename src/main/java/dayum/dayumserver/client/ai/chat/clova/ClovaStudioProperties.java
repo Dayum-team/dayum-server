@@ -1,4 +1,4 @@
-package dayum.dayumserver.client.clova;
+package dayum.dayumserver.client.ai.chat.clova;
 
 import lombok.Getter;
 import lombok.Setter;
