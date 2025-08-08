@@ -1,7 +1,5 @@
 package dayum.dayumserver.application.contents;
 
-import java.util.List;
-
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
@@ -10,6 +8,7 @@ import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientDa
 import dayum.dayumserver.domain.contents.Contents;
 import dayum.dayumserver.domain.contents.ContentsRepository;
 import dayum.dayumserver.domain.member.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

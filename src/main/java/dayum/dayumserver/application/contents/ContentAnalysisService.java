@@ -1,5 +1,16 @@
 package dayum.dayumserver.application.contents;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dayum.dayumserver.application.common.exception.AppException;
+import dayum.dayumserver.application.common.exception.CommonExceptionCode;
+import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
+import dayum.dayumserver.client.ai.chat.clova.ClovaService;
+import dayum.dayumserver.client.ai.ocr.OcrService;
+import dayum.dayumserver.client.ai.speech.NcpSpeechClient;
+import dayum.dayumserver.client.cv.FrameExtractorService;
+import dayum.dayumserver.client.s3.S3ClientService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,24 +19,10 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dayum.dayumserver.application.common.exception.AppException;
-import dayum.dayumserver.application.common.exception.CommonExceptionCode;
-import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
-import dayum.dayumserver.client.ai.speech.NcpSpeechClient;
-import dayum.dayumserver.client.ai.speech.dto.NcpSpeechRecognizeResponse;
-import dayum.dayumserver.client.clova.ClovaService;
-import dayum.dayumserver.client.cv.FrameExtractorService;
-import dayum.dayumserver.client.ocr.OcrService;
-import dayum.dayumserver.client.s3.S3ClientService;
+import java.util.concurrent.StructuredTaskScope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -42,17 +39,22 @@ public class ContentAnalysisService {
   public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
     Path workingDir = createWorkingDirectory();
 
-    try {
-      File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
-      List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
+    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+      StructuredTaskScope.Subtask<String> ocrTask =
+          scope.fork(
+              () -> {
+                File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
+                List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
+                return ocrService.extractTextFromFiles(frames);
+              });
+      StructuredTaskScope.Subtask<String> recognizeSpeechTask =
+          scope.fork(() -> ncpSpeechClient.recognize(contentsUrl).fullText());
 
-      String subtitleText = ocrService.extractTextFromFiles(frameFiles);
-
-      NcpSpeechRecognizeResponse ncpSpeechRecognizeResponse =
-          ncpSpeechClient.recognize(contentsUrl);
-
-      return extractIngredientsWithAI(subtitleText, ncpSpeechRecognizeResponse.fullText());
-
+      scope.join();
+      scope.throwIfFailed();
+      return extractIngredientsWithAI(ocrTask.get(), recognizeSpeechTask.get());
+    } catch (Exception e) {
+      throw new RuntimeException("Ingredient analysis failed", e);
     } finally {
       deleteWorkingDirectory(workingDir);
     }

@@ -1,4 +1,4 @@
-package dayum.dayumserver.client.ocr;
+package dayum.dayumserver.client.ai.ocr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
