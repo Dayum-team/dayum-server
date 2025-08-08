@@ -47,10 +47,8 @@ public class ContentsService {
 
   public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl, Long memberId) {
 
-    Long contentsId =
-        contentsRepository
-            .save(Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl))
-            .id();
+    var contents = Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl);
+    Long contentsId = contentsRepository.save(contents).id();
 
     List<ExtractedIngredientData> analysisResult =
         contentAnalysisService.analyzeIngredients(contentsUrl);
