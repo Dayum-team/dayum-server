@@ -40,6 +40,10 @@ ncp:
     secret-key: ${ncp.ocr.secret-key}
     api-url: ${ncp.ocr.api-url}
 
+  clova:
+    base-url: ${ncp.clova.base-url}
+    api-key: ${ncp.clova.api-key}
+
 ---
 spring:
   config:

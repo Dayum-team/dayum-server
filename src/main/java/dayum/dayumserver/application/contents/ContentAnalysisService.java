@@ -7,14 +7,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import dayum.dayumserver.application.common.exception.AppException;
 import dayum.dayumserver.application.common.exception.CommonExceptionCode;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
+import dayum.dayumserver.client.ai.speech.NcpSpeechClient;
+import dayum.dayumserver.client.ai.speech.dto.NcpSpeechRecognizeResponse;
+import dayum.dayumserver.client.clova.ClovaService;
 import dayum.dayumserver.client.cv.FrameExtractorService;
 import dayum.dayumserver.client.ocr.OcrService;
 import dayum.dayumserver.client.s3.S3ClientService;
@@ -29,6 +35,9 @@ public class ContentAnalysisService {
   private final S3ClientService s3ClientService;
   private final FrameExtractorService frameExtractorService;
   private final OcrService ocrService;
+  private final NcpSpeechClient ncpSpeechClient;
+  private final ClovaService clovaService;
+  private final ObjectMapper objectMapper;
 
   public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
     Path workingDir = createWorkingDirectory();
@@ -37,10 +46,12 @@ public class ContentAnalysisService {
       File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
       List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
 
-      Map<String, String> ocrTexts = ocrService.extractTextFromFiles(frameFiles);
-      log.info("OCR texts extracted: {}", ocrTexts.toString());
+      String subtitleText = ocrService.extractTextFromFiles(frameFiles);
 
-      return extractIngredientsWithAI(ocrTexts);
+      NcpSpeechRecognizeResponse ncpSpeechRecognizeResponse =
+          ncpSpeechClient.recognize(contentsUrl);
+
+      return extractIngredientsWithAI(subtitleText, ncpSpeechRecognizeResponse.fullText());
 
     } finally {
       deleteWorkingDirectory(workingDir);
@@ -49,7 +60,8 @@ public class ContentAnalysisService {
 
   private Path createWorkingDirectory() {
     try {
-      Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
+      Path workingDir =
+          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
       Files.createDirectory(workingDir);
       return workingDir;
     } catch (IOException e) {
@@ -57,9 +69,9 @@ public class ContentAnalysisService {
     }
   }
 
-  private List<ExtractedIngredientData> extractIngredientsWithAI(Map<String, String> ocrTexts) {
-    // Clova Studio 로직 추가 예정
-    return null;
+  private List<ExtractedIngredientData> extractIngredientsWithAI(
+      String subtitleText, String speechText) {
+    return parseIngredientsFromJson(clovaService.extractIngredients(subtitleText, speechText));
   }
 
   private void deleteWorkingDirectory(Path path) {
@@ -67,6 +79,19 @@ public class ContentAnalysisService {
       Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     } catch (IOException e) {
       throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private List<ExtractedIngredientData> parseIngredientsFromJson(String jsonResponse) {
+    try {
+      JsonNode root = objectMapper.readTree(jsonResponse);
+      JsonNode ingredientsNode = root.get("ingredients");
+
+      return objectMapper.convertValue(
+          ingredientsNode, new TypeReference<List<ExtractedIngredientData>>() {});
+    } catch (Exception e) {
+      log.error("Failed to parse ingredients JSON: {}", jsonResponse, e);
+      return List.of();
     }
   }
 }

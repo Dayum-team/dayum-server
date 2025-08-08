@@ -41,32 +41,21 @@ public class OcrService {
     ocrThreadPool.shutdown();
   }
 
-  /** 파일별 OCR 결과를 Map으로 반환 */
-  public Map<String, String> extractTextFromFiles(List<File> files) {
+  /** 파일들에서 추출한 텍스트를 합쳐서 반환 */
+  public String extractTextFromFiles(List<File> files) {
     if (files == null || files.isEmpty()) {
-      return Map.of();
+      return "";
     }
 
-    List<CompletableFuture<Map.Entry<String, String>>> futures =
+    List<CompletableFuture<String>> futures =
         files.stream()
             .map(
                 file ->
-                    CompletableFuture.supplyAsync(
-                        () -> {
-                          String text = extractTextFromFile(file);
-                          return Map.entry(file.getName(), text);
-                        },
-                        ocrThreadPool))
+                    CompletableFuture.supplyAsync(() -> extractTextFromFile(file), ocrThreadPool))
             .collect(Collectors.toList());
 
     return futures.stream()
         .map(CompletableFuture::join)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-  }
-
-  /** Map 결과를 이어진 텍스트로 변환 */
-  public String combineTexts(Map<String, String> textMap) {
-    return textMap.values().stream()
         .filter(text -> !text.isEmpty())
         .collect(Collectors.joining(" "))
         .trim();
