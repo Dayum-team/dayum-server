@@ -1,4 +1,4 @@
-package dayum.dayumserver.client.clova.dto;
+package dayum.dayumserver.client.ai.chat.clova.dto;
 
 import java.util.List;
 

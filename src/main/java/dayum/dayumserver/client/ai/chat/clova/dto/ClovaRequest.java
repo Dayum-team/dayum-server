@@ -1,8 +1,8 @@
-package dayum.dayumserver.client.clova.dto;
+package dayum.dayumserver.client.ai.chat.clova.dto;
 
 import java.util.List;
 
-import dayum.dayumserver.client.clova.ClovaStudioProperties;
+import dayum.dayumserver.client.ai.chat.clova.ClovaStudioProperties;
 import lombok.Builder;
 
 @Builder
