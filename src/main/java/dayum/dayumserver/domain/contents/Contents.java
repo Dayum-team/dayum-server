@@ -1,16 +1,24 @@
 package dayum.dayumserver.domain.contents;
 
 import dayum.dayumserver.domain.member.Member;
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Builder
 public record Contents(
     Long id,
     Member member,
     String thumbnailUrl,
     String url,
     List<ContentsIngredient> ingredients,
+    ContentStatus status,
     LocalDateTime createdAt) {
+
+  public static Contents createDraft(Member member, String url) {
+    return Contents.builder().member(member).url(url).status(ContentStatus.PENDING).build();
+  }
 
   public double calculateCalories() {
     return ingredients.stream().mapToDouble(it -> it.ingredient().calories() * it.quantity()).sum();

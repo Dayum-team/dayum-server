@@ -40,7 +40,8 @@ public class ContentsController {
   @PostMapping
   public ApiResponse<ContentsAnalyzeResponse> analyzeContents(
       @RequestBody ContentsAnalyzeRequest request) {
-    var analyzeResponse = contentsService.extractIngredientsFromContent(request.contentsUrl());
+    var analyzeResponse =
+        contentsService.extractIngredientsFromContent(request.contentsUrl(), request.memberId());
     return ApiResponse.of(analyzeResponse);
   }
 }
