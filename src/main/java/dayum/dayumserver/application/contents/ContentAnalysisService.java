@@ -72,8 +72,8 @@ public class ContentAnalysisService {
   }
 
   private List<ExtractedIngredientData> extractIngredientsWithAI(
-      String ocrTexts, String speechText) {
-    return parseIngredientsFromJson(clovaService.extractIngredients(ocrTexts, speechText));
+      String subtitleText, String speechText) {
+    return parseIngredientsFromJson(clovaService.extractIngredients(subtitleText, speechText));
   }
 
   private void deleteWorkingDirectory(Path path) {

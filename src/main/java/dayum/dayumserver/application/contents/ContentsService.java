@@ -1,24 +1,23 @@
 package dayum.dayumserver.application.contents;
 
-import java.util.List;
-
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
+import dayum.dayumserver.domain.contents.Contents;
 import dayum.dayumserver.domain.contents.ContentsRepository;
+import dayum.dayumserver.domain.member.MemberRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ContentsService {
 
   private final ContentsRepository contentsRepository;
+  private final MemberRepository memberRepository;
   private final ContentAnalysisService contentAnalysisService;
 
   public PageResponse<ContentsResponse> retrieveNextPage(Long memberId, long cursorId, int size) {
@@ -43,13 +42,15 @@ public class ContentsService {
     return ContentsDetailResponse.from(contents);
   }
 
-  public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl) {
+  public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl, Long memberId) {
 
-    //TODO DB에 contents status pending상태로 memberId + contentsURL 저장
+    var contents = Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl);
+    contentsRepository.save(contents);
 
-    List<ExtractedIngredientData> analysisResult = contentAnalysisService.analyzeIngredients(contentsUrl);
+    List<ExtractedIngredientData> analysisResult =
+        contentAnalysisService.analyzeIngredients(contentsUrl);
 
-    //TODO 추출된 재료와 DB 데이터 매핑후 반환
+    // TODO 추출된 재료와 DB 데이터 매핑후 반환
 
     return new ContentsAnalyzeResponse();
   }

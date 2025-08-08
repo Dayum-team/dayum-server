@@ -11,8 +11,9 @@ import dayum.dayumserver.application.common.response.ErrorResponse;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(AppException.class)
-  public ErrorResponse handleAppException(AppException exception) {
-    return ErrorResponse.of(exception);
+  public ResponseEntity<ErrorResponse> handleAppException(AppException exception) {
+    return ResponseEntity.status(exception.getExceptionCode().getStatus())
+        .body(ErrorResponse.of(exception));
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
