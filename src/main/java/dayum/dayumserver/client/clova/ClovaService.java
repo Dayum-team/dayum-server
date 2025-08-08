@@ -1,7 +1,7 @@
 package dayum.dayumserver.client.clova;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
+import dayum.dayumserver.client.clova.dto.ClovaRequest;
+import dayum.dayumserver.client.clova.dto.ClovaResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -24,38 +21,31 @@ public class ClovaService {
   private final ClovaStudioProperties properties;
   private final RestClient restClient;
 
-  public String extractIngredients(String ocrText, String speechText) {
-    String combinedText = buildCombinedText(ocrText, speechText);
-    return chatCompletion(ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION, combinedText);
+  public String extractIngredients(String subtitleText, String speechText) {
+    String userPrompt = buildUserPrompt(subtitleText, speechText);
+    return chatCompletion(ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION, userPrompt);
   }
 
   public String chatCompletion(String systemMessage, String userMessage) {
-    var requestBody = buildRequestBody(systemMessage, userMessage);
+    ClovaRequest request = ClovaRequest.of(systemMessage, userMessage);
 
-    try {
-      Map<String, Object> response =
-          restClient
-              .post()
-              .uri(properties.getBaseUrl())
-              .header("Authorization", "Bearer " + properties.getApiKey())
-              .header("X-NCP-CLOVASTUDIO-REQUEST-ID", UUID.randomUUID().toString())
-              .header("Content-Type", "application/json")
-              .header("Accept", "application/json")
-              .body(requestBody)
-              .retrieve()
-              .body(Map.class);
+    ClovaResponse response =
+        restClient
+            .post()
+            .uri(properties.getBaseUrl())
+            .header("Authorization", "Bearer " + properties.getApiKey())
+            .header("X-NCP-CLOVASTUDIO-REQUEST-ID", UUID.randomUUID().toString())
+            .body(request)
+            .retrieve()
+            .body(ClovaResponse.class);
 
-      return extractContentFromResponse(response);
-
-    } catch (RestClientResponseException e) {
-      throw new RuntimeException(
-          "CLOVA Studio error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
-    } catch (Exception e) {
-      throw new RuntimeException("CLOVA Studio call failed", e);
-    }
+	  if (response != null) {
+		  return response.result().message().content();
+	  }
+      throw new RuntimeException("Clova Studio chat completion failed");
   }
 
-  private String buildCombinedText(String ocrText, String speechText) {
+  private String buildUserPrompt(String ocrText, String speechText) {
     StringBuilder combined = new StringBuilder();
 
     if (ocrText != null && !ocrText.trim().isEmpty()) {
@@ -66,40 +56,5 @@ public class ClovaService {
     }
 
     return combined.toString();
-  }
-
-  private Map<String, Object> buildRequestBody(String systemMessage, String userMessage) {
-    return Map.of(
-        "messages",
-        List.of(
-            Map.of(
-                "role",
-                "system",
-                "content",
-                List.of(Map.of("type", "text", "text", systemMessage))),
-            Map.of(
-                "role", "user", "content", List.of(Map.of("type", "text", "text", userMessage)))),
-        "topP",
-        ClovaStudioProperties.ModelConfig.TOP_P,
-        "topK",
-        ClovaStudioProperties.ModelConfig.TOP_K,
-        "maxTokens",
-        ClovaStudioProperties.ModelConfig.MAX_TOKENS,
-        "temperature",
-        ClovaStudioProperties.ModelConfig.TEMPERATURE,
-        "repetitionPenalty",
-        ClovaStudioProperties.ModelConfig.REPETITION_PENALTY,
-        "stop",
-        List.of(),
-        "seed",
-        ClovaStudioProperties.ModelConfig.SEED,
-        "includeAiFilters",
-        ClovaStudioProperties.ModelConfig.INCLUDE_AI_FILTERS);
-  }
-
-  private String extractContentFromResponse(Map<String, Object> response) {
-    Map<String, Object> result = (Map<String, Object>) response.get("result");
-    Map<String, Object> message = (Map<String, Object>) result.get("message");
-    return (String) message.get("content");
   }
 }

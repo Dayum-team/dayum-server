@@ -29,14 +29,19 @@ public class ClovaStudioProperties {
   public static class PromptConfig {
     public static final String INGREDIENT_EXTRACTION =
         """
-            당신은 다이어트 요리 영상의 자막에서 식재료를 추출하는 AI입니다.
+            당신은 다이어트 요리 영상의 자막과 음성에서 식재료를 추출하는 AI입니다.
             주어진 텍스트에서 식재료와 사용량을 JSON 형식으로 추출해주세요.
             레시피와 재료도구는 추출하지 않아도 됩니다.
-            사용량은 g, ml등 단위를 적어주세요.
-            사용량이 정확히 적혀있지 않아도 추측해서 함께 적어주세요.
+            사용량은 g 단위를 사용하세요.
+            응답 형식에 유의하세요.
 
 
             응답 형식:
+            재료를 추출하여 JSON 형식으로 반환하세요.
+            마크다운이나 코드 블록 없이 순수 JSON만 응답하세요
+            형식: {\\"ingredients\\": [{\\"name\\": \\"재료명\\", \\"quantity\\": \\"양\\"}, ...]}
+
+            예시:
             {
               "ingredients": [
                 {"name": "닭가슴살", "quantity": "200g"},

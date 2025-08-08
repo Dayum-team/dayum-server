@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -47,12 +46,12 @@ public class ContentAnalysisService {
       File downloadedFile = s3ClientService.downloadFile(contentsUrl, workingDir);
       List<File> frameFiles = frameExtractorService.extractFrames(downloadedFile, workingDir);
 
-      String ocrTexts = ocrService.extractTextFromFiles(frameFiles);
+      String subtitleText = ocrService.extractTextFromFiles(frameFiles);
 
       NcpSpeechRecognizeResponse ncpSpeechRecognizeResponse =
           ncpSpeechClient.recognize(contentsUrl);
 
-      return extractIngredientsWithAI(ocrTexts, ncpSpeechRecognizeResponse.fullText());
+      return extractIngredientsWithAI(subtitleText, ncpSpeechRecognizeResponse.fullText());
 
     } finally {
       deleteWorkingDirectory(workingDir);
@@ -70,8 +69,9 @@ public class ContentAnalysisService {
     }
   }
 
-  private List<ExtractedIngredientData> extractIngredientsWithAI(String ocrTexts, String speechText) {
-    return parseIngredientsFromJson(clovaService.extractIngredients(ocrTexts, speechText).toString());
+  private List<ExtractedIngredientData> extractIngredientsWithAI(
+      String subtitleText, String speechText) {
+    return parseIngredientsFromJson(clovaService.extractIngredients(subtitleText, speechText));
   }
 
   private void deleteWorkingDirectory(Path path) {
