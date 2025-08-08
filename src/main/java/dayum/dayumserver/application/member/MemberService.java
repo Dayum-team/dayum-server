@@ -11,7 +11,6 @@ import dayum.dayumserver.domain.member.Member;
 import dayum.dayumserver.domain.member.MemberRepository;
 import dayum.dayumserver.domain.member.Oauth2Provider;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,16 +35,15 @@ public class MemberService {
         .orElseGet(
             () ->
                 memberRepository.save(
-                    new Member(
-                        null,
-                        user.email(),
-                        user.name(),
-                        nickname,
-                        profileImage,
-                        provider,
-                        bio,
-                        false,
-                        null)));
+                    Member.builder()
+                        .email(user.email())
+                        .name(user.name())
+                        .nickname(nickname)
+                        .profileImage(profileImage)
+                        .oauth2Provider(provider)
+                        .bio(bio)
+                        .deleted(false)
+                        .build()));
   }
 
   public boolean isNicknameDuplicated(String nickname) {
@@ -53,11 +51,11 @@ public class MemberService {
   }
 
   public LoginResponse login(LoginRequest request, Oauth2Provider provider) {
-    String accessToken = request.accessToken();
+    String oauthAccessToken = request.accessToken(); // OAuth2 provider token
 
     OAuthUserInfo userInfo =
         switch (provider) {
-          case NAVER -> naverOAuthClient.getUserInfo(accessToken);
+          case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
           case APPLE -> throw new UnsupportedOperationException("Apple not implemented yet");
         };
 
@@ -67,10 +65,12 @@ public class MemberService {
     String bio = Optional.ofNullable(request.bio()).orElse("");
 
     Member member = loginOrRegister(userInfo, nickname, profileImage, bio, provider);
-    String jwt = jwtProvider.createToken(member.id());
-    String refresh = jwtProvider.createRefreshToken(member.id());
 
-    return new LoginResponse(jwt, refresh);
+    // 앱에서 사용할 토큰
+    String appAccessToken = jwtProvider.createToken(member.id());
+    String appRefreshToken = jwtProvider.createRefreshToken(member.id());
+
+    return new LoginResponse(appAccessToken, appRefreshToken);
   }
 
   @Transactional
@@ -81,22 +81,10 @@ public class MemberService {
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
     if (member.deleted()) {
-      return false; // 이미 탈퇴 상태
+      return false;
     }
 
-    Member updated =
-        new Member(
-            member.id(),
-            member.email(),
-            member.name(),
-            member.nickname(),
-            member.profileImage(),
-            member.oauth2Provider(),
-            member.bio(),
-            true, // deleted
-            LocalDateTime.now());
-
-    memberRepository.save(updated);
+    memberRepository.save(member.markAsDeleted());
     return true;
   }
 }
