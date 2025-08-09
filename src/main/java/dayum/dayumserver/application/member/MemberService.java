@@ -53,23 +53,39 @@ public class MemberService {
     return memberRepository.existsByNickname(nickname);
   }
 
-  public Optional<LoginResponse> login(LoginRequest request, Oauth2Provider provider) {
+  private OAuthUserInfo resolveOAuthUser(
+      Oauth2Provider provider, String accessTokenOrIdToken, String authorizationCode) {
 
+    return switch (provider) {
+      case NAVER -> {
+        if (isBlank(accessTokenOrIdToken)) {
+          throw new IllegalArgumentException("NAVER requires accessToken");
+        }
+        yield naverOAuthClient.getUserInfo(accessTokenOrIdToken);
+      }
+      case APPLE -> {
+        // 규칙: Apple은 accessToken 필드에 id_token이 들어올 수 있음(팀 컨벤션)
+        if (!isBlank(accessTokenOrIdToken)) {
+          yield appleAuthService.parseIdTokenToUser(accessTokenOrIdToken);
+        }
+        if (!isBlank(authorizationCode)) {
+          AppleTokenResponse tokens = appleAuthService.exchangeCodeForTokens(authorizationCode);
+          yield appleAuthService.parseIdTokenToUser(tokens.id_token());
+        }
+        throw new IllegalArgumentException(
+            "APPLE requires id_token (in accessToken) or authorizationCode");
+      }
+    };
+  }
+
+  private boolean isBlank(String s) {
+    return s == null || s.isBlank();
+  }
+
+  public Optional<LoginResponse> login(LoginRequest request, Oauth2Provider provider) {
     OAuthUserInfo userInfo =
-        switch (provider) {
-          case NAVER -> naverOAuthClient.getUserInfo(request.accessToken());
-          case APPLE -> {
-            if (request.accessToken() != null && !request.accessToken().isBlank()) {
-              yield appleAuthService.parseIdTokenToUser(request.accessToken());
-            }
-            if (request.authorizationCode() != null && !request.authorizationCode().isBlank()) {
-              AppleTokenResponse tokens =
-                  appleAuthService.exchangeCodeForTokens(request.authorizationCode());
-              yield appleAuthService.parseIdTokenToUser(tokens.id_token());
-            }
-            throw new IllegalArgumentException("APPLE login requires idToken or authorizationCode");
-          }
-        };
+        resolveOAuthUser(provider, request.accessToken(), request.authorizationCode());
+
     return memberRepository
         .findByEmailAndProvider(userInfo.email(), provider)
         .filter(m -> !m.deleted())
@@ -80,26 +96,12 @@ public class MemberService {
   }
 
   public LoginResponse signup(RegisterRequest request, Oauth2Provider provider) {
-    String oauthAccessToken = request.accessToken(); // OAuth2 provider token
-
     OAuthUserInfo userInfo =
-        switch (provider) {
-          case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
-          case APPLE -> {
-            if (request.accessToken() != null && !request.accessToken().isBlank()) {
-              yield appleAuthService.parseIdTokenToUser(request.accessToken());
-            }
-            if (request.authorizationCode() != null && !request.authorizationCode().isBlank()) {
-              AppleTokenResponse tokens =
-                  appleAuthService.exchangeCodeForTokens(request.authorizationCode());
-              yield appleAuthService.parseIdTokenToUser(tokens.id_token());
-            }
-            throw new IllegalArgumentException(
-                "APPLE signup requires idToken or authorizationCode");
-          }
-        };
+        resolveOAuthUser(provider, request.accessToken(), request.authorizationCode());
 
-    String nickname = Optional.ofNullable(request.nickname()).orElse(userInfo.name());
+    String nickname =
+        Optional.ofNullable(request.nickname())
+            .orElseThrow(() -> new IllegalArgumentException("닉네임은 필수 입력 값입니다."));
     String profileImage =
         Optional.ofNullable(request.profileImage()).orElse(userInfo.profileImage());
     String bio = Optional.ofNullable(request.bio()).orElse("");

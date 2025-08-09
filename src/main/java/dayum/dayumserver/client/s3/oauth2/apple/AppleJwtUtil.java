@@ -17,7 +17,6 @@ public class AppleJwtUtil {
     String keyId = "FMM3DT22J7";
     String privateKeyPath = "src/main/resources/AuthKey_FMM3DT22J7.p8";
 
-    // 1. .p8 키 로드
     String privateKeyPem =
         new String(Files.readAllBytes(Paths.get(privateKeyPath)))
             .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -29,17 +28,15 @@ public class AppleJwtUtil {
     KeyFactory kf = KeyFactory.getInstance("EC");
     ECPrivateKey privateKey = (ECPrivateKey) kf.generatePrivate(keySpec);
 
-    // 2. JWT Claims 생성
     JWTClaimsSet claimsSet =
         new JWTClaimsSet.Builder()
             .issuer(teamId)
             .issueTime(new Date())
-            .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000)) // 1시간
+            .expirationTime(new Date(System.currentTimeMillis() + 3600 * 1000))
             .audience("https://appleid.apple.com")
             .subject(clientId)
             .build();
 
-    // 3. Header + Signing
     JWSHeader header =
         new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(keyId).type(JOSEObjectType.JWT).build();
 
