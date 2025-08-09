@@ -3,6 +3,8 @@ package dayum.dayumserver.application.member;
 import static dayum.dayumserver.domain.member.Oauth2Provider.APPLE;
 import static dayum.dayumserver.domain.member.Oauth2Provider.NAVER;
 
+import dayum.dayumserver.application.member.dto.AppleTokenResponse;
+import dayum.dayumserver.application.member.dto.LoginRequest;
 import dayum.dayumserver.application.member.dto.LoginResponse;
 import dayum.dayumserver.application.member.dto.OAuthUserInfo;
 import dayum.dayumserver.application.member.dto.RegisterRequest;
@@ -21,6 +23,7 @@ public class MemberService {
 
   private final MemberRepository memberRepository;
   private final NaverOAuthClient naverOAuthClient;
+  private final AppleAuthService appleAuthService;
   private final JwtProvider jwtProvider;
 
   public Member loginOrRegister(
@@ -50,12 +53,22 @@ public class MemberService {
     return memberRepository.existsByNickname(nickname);
   }
 
-  public Optional<LoginResponse> login(String oauthAccessToken, Oauth2Provider provider) {
+  public Optional<LoginResponse> login(LoginRequest request, Oauth2Provider provider) {
 
     OAuthUserInfo userInfo =
         switch (provider) {
-          case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
-          case APPLE -> throw new UnsupportedOperationException("Apple not implemented yet");
+          case NAVER -> naverOAuthClient.getUserInfo(request.accessToken());
+          case APPLE -> {
+            if (request.idToken() != null && !request.idToken().isBlank()) {
+              yield appleAuthService.parseIdTokenToUser(request.idToken());
+            }
+            if (request.authorizationCode() != null && !request.authorizationCode().isBlank()) {
+              AppleTokenResponse tokens =
+                  appleAuthService.exchangeCodeForTokens(request.authorizationCode());
+              yield appleAuthService.parseIdTokenToUser(tokens.id_token());
+            }
+            throw new IllegalArgumentException("APPLE login requires idToken or authorizationCode");
+          }
         };
     return memberRepository
         .findByEmailAndProvider(userInfo.email(), provider)
@@ -72,7 +85,18 @@ public class MemberService {
     OAuthUserInfo userInfo =
         switch (provider) {
           case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
-          case APPLE -> throw new UnsupportedOperationException("Apple not implemented yet");
+          case APPLE -> {
+            if (request.idToken() != null && !request.idToken().isBlank()) {
+              yield appleAuthService.parseIdTokenToUser(request.idToken());
+            }
+            if (request.authorizationCode() != null && !request.authorizationCode().isBlank()) {
+              AppleTokenResponse tokens =
+                  appleAuthService.exchangeCodeForTokens(request.authorizationCode());
+              yield appleAuthService.parseIdTokenToUser(tokens.id_token());
+            }
+            throw new IllegalArgumentException(
+                "APPLE signup requires idToken or authorizationCode");
+          }
         };
 
     String nickname = Optional.ofNullable(request.nickname()).orElse(userInfo.name());
@@ -82,11 +106,8 @@ public class MemberService {
 
     Member member = loginOrRegister(userInfo, nickname, profileImage, bio, provider);
 
-    // 앱에서 사용할 토큰
-    String appAccessToken = jwtProvider.createToken(member.id());
-    String appRefreshToken = jwtProvider.createRefreshToken(member.id());
-
-    return new LoginResponse(appAccessToken, appRefreshToken);
+    return new LoginResponse(
+        jwtProvider.createToken(member.id()), jwtProvider.createRefreshToken(member.id()));
   }
 
   @Transactional

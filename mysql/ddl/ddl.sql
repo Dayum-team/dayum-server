@@ -1,9 +1,17 @@
-CREATE TABLE members
-(
-    member_id  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    nickname   VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE `members` (
+                           `member_id` bigint NOT NULL AUTO_INCREMENT,
+                           `created_at` datetime(6) NOT NULL,
+                           `updated_at` datetime(6) NOT NULL,
+                           `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '이메일',
+                           `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '이름',
+                           `nickname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '닉네임',
+                           `profile_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '프로필 이미지',
+                           `introduce` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '자기소개',
+                           `bio` varchar(1000) COLLATE utf8mb4_general_ci DEFAULT NULL,
+                           `oauth2provider` enum('APPLE','NAVER') COLLATE utf8mb4_general_ci NOT NULL,
+                           `deleted` bit(1) NOT NULL,
+                           `deleted_at` datetime(6) DEFAULT NULL,
+                           PRIMARY KEY (`member_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE INDEX idx_members_nickname ON members (nickname);

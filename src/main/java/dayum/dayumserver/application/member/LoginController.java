@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-public class NaverLoginController {
+public class LoginController {
 
   private final MemberService memberService;
   private final NaverOAuthClient naverOAuthClient;
   private final JwtProvider jwtProvider;
 
   @PostMapping("/signup/{provider}")
-  public ResponseEntity<LoginResponse> login(
+  public ResponseEntity<LoginResponse> signup(
       @PathVariable String provider, @RequestBody RegisterRequest request) {
     Oauth2Provider oauth2Provider = Oauth2Provider.from(provider.toUpperCase());
     LoginResponse response = memberService.signup(request, oauth2Provider);
@@ -32,8 +32,8 @@ public class NaverLoginController {
     Oauth2Provider oauth2Provider = Oauth2Provider.from(provider.toUpperCase());
 
     return memberService
-        .login(request.accessToken(), oauth2Provider)
+        .login(request, oauth2Provider)
         .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.status(401).build()); // 미가입 or 탈퇴 -> 401
+        .orElseGet(() -> ResponseEntity.status(401).build());
   }
 }
