@@ -1,11 +1,9 @@
 package dayum.dayumserver.application.ingredient;
 
-import dayum.dayumserver.application.ingredient.dto.IngredientResponse;
-import dayum.dayumserver.domain.ingredient.Ingredient;
-import dayum.dayumserver.domain.ingredient.IngredientRepository;
 import java.util.List;
-import java.util.Optional;
 
+import dayum.dayumserver.application.ingredient.dto.IngredientResponse;
+import dayum.dayumserver.domain.ingredient.IngredientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +15,5 @@ public class IngredientService {
 
   public List<IngredientResponse> search(String keyword) {
     return ingredientRepository.search(keyword).stream().map(IngredientResponse::from).toList();
-  }
-
-  public List<Ingredient> findAllByIds(List<Long> ingredientIds) {
-    return ingredientRepository.findAllBy(ingredientIds);
   }
 }
