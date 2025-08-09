@@ -44,9 +44,7 @@ public class FrameExtractorService {
         double mean = meanLuma(centerCrop(bufferedImage));
         if (mean >= MIN_MEAN_LUMA) {
             String fileName = STR."\{FRAME_FILE_PREFIX}\{frame.timestamp}.\{FRAME_FILE_EXTENSION}";
-            Path outputPath = workingDir.resolve(fileName);
-            File outputFile = outputPath.toFile();
-
+            File outputFile = workingDir.resolve(fileName).toFile();
             ImageIO.write(bufferedImage, FRAME_FILE_EXTENSION, outputFile);
             return outputFile;
           }
@@ -76,9 +74,7 @@ public class FrameExtractorService {
           if (bufferedImage != null) {
             int frameIndex = frameCount / frameInterval;
             String fileName = STR."\{FRAME_FILE_PREFIX}\{frameIndex}.\{FRAME_FILE_EXTENSION}";
-            Path outputPath = workingDir.resolve(fileName);
-            File outputFile = outputPath.toFile();
-
+            File outputFile = workingDir.resolve(fileName).toFile();
             ImageIO.write(bufferedImage, FRAME_FILE_EXTENSION, outputFile);
             frameFiles.add(outputFile);
           }
