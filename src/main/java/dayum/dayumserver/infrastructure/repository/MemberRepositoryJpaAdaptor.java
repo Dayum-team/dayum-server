@@ -40,6 +40,7 @@ public class MemberRepositoryJpaAdaptor implements MemberRepository {
   public Optional<Member> findById(Long id) {
     return memberJpaRepository.findById(id).map(this::toDomain);
   }
+
   @Override
   public Member fetchBy(long memberId) {
     return memberJpaRepository
@@ -47,17 +48,9 @@ public class MemberRepositoryJpaAdaptor implements MemberRepository {
         .map(memberMapper::mapToDomainEntity)
         .orElseThrow(() -> new AppException(CommonExceptionCode.BAD_REQUEST));
   }
+
   private Member toDomain(MemberJpaEntity entity) {
-    return new Member(
-        entity.getId(),
-        entity.getEmail(),
-        entity.getName(),
-        entity.getNickname(),
-        entity.getProfileImage(),
-        entity.getOauth2Provider(),
-        entity.getBio(),
-        entity.isDeleted(),
-        entity.getDeletedAt());
+    return memberMapper.mapToDomainEntity(entity);
   }
 
   private MemberJpaEntity toEntity(Member member) {
