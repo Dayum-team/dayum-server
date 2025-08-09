@@ -31,6 +31,17 @@ ncp:
   access-key: ${ncp.access-key}
   secret-key: ${ncp.secret-key}
   s3-endpoint: https://kr.object.ncloudstorage.com
+  speech:
+    base-url: ${ncp.speech.base-url}
+    secret-key: ${ncp.speech.secret-key}
+
+  ocr:
+    secret-key: ${ncp.ocr.secret-key}
+    api-url: ${ncp.ocr.api-url}
+
+  clova:
+    base-url: ${ncp.clova.base-url}
+    api-key: ${ncp.clova.api-key}
 
 jwt:
   secret: ${jwt.secret}
@@ -68,3 +79,4 @@ spring:
 
 ncp:
   s3-bucket: dayum2-prod
+

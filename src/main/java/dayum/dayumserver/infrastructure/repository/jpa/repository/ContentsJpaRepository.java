@@ -15,9 +15,9 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
   @Query(
       "SELECT contents "
           + "FROM ContentsJpaEntity contents "
-          + "JOIN FETCH contents.member "
-          + "JOIN FETCH contents.ingredients ci "
-          + "JOIN FETCH ci.ingredient "
+          + "LEFT JOIN FETCH contents.member "
+          + "LEFT JOIN FETCH contents.ingredients ci "
+          + "LEFT JOIN FETCH ci.ingredient "
           + "WHERE contents.member.id = :memberId "
           + "AND contents.id >= :cursorId "
           + "ORDER BY contents.id")
@@ -27,9 +27,9 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
   @Query(
       "SELECT contents "
           + "FROM ContentsJpaEntity contents "
-          + "JOIN FETCH contents.member "
-          + "JOIN FETCH contents.ingredients ci "
-          + "JOIN FETCH ci.ingredient "
+          + "LEFT JOIN FETCH contents.member "
+          + "LEFT JOIN FETCH contents.ingredients ci "
+          + "LEFT JOIN FETCH ci.ingredient "
           + "WHERE contents.id >= :cursorId "
           + "ORDER BY contents.id")
   List<ContentsJpaEntity> findNextPage(@Param("cursorId") long cursorId, Pageable page);
@@ -37,9 +37,9 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
   @Query(
       "SELECT contents "
           + "FROM ContentsJpaEntity contents "
-          + "JOIN FETCH contents.member "
-          + "JOIN FETCH contents.ingredients ci "
-          + "JOIN FETCH ci.ingredient "
+          + "LEFT JOIN FETCH contents.member "
+          + "LEFT JOIN FETCH contents.ingredients ci "
+          + "LEFT JOIN FETCH ci.ingredient "
           + "WHERE contents.id = :id")
   Optional<ContentsJpaEntity> findById(@Param("id") long id);
 }
