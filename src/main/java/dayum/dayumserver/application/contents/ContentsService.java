@@ -75,12 +75,12 @@ public class ContentsService {
 
     var contents =
         Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl, thumbnailUrl);
-    contentsRepository.save(contents);
+    var savedContents = contentsRepository.save(contents);
 
     List<String> ingredientNames =
         extractedIngredients.stream().map(ExtractedIngredientData::name).toList();
     List<Ingredient> ingredients = ingredientService.findIngredientsByNames(ingredientNames);
-    return ContentsAnalyzeResponse.from(contents.id(), ingredients);
+    return ContentsAnalyzeResponse.from(savedContents.id(), ingredients);
   }
 
   public String addIngredients(Long contentsId, ContentsUploadRequest contentsUploadRequest) {
