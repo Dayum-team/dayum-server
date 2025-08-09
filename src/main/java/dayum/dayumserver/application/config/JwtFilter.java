@@ -3,33 +3,69 @@ package dayum.dayumserver.application.config;
 import dayum.dayumserver.application.member.JwtProvider;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.util.AntPathMatcher;
 
+@RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
   private final JwtProvider jwtProvider;
+  private final AntPathMatcher matcher = new AntPathMatcher();
 
-  public JwtFilter(JwtProvider jwtProvider) {
-    this.jwtProvider = jwtProvider;
-  }
+  private final List<String> whitelist =
+      List.of(
+          "/", "/health", "/docs/**", "/swagger-ui/**", "/v3/api-docs/**", "/login/**", "/auth/**");
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
-    HttpServletRequest httpRequest = (HttpServletRequest) request;
-    String authHeader = httpRequest.getHeader("Authorization");
+    HttpServletRequest req = (HttpServletRequest) request;
+    HttpServletResponse res = (HttpServletResponse) response;
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      String token = authHeader.substring(7);
+    String uri = req.getRequestURI();
 
-      if (jwtProvider.validate(token)) {
-        Long memberId = jwtProvider.getMemberId(token);
-        // 요청 속성에 memberId 저장 → 컨트롤러에서 꺼낼 수 있음
-        httpRequest.setAttribute("memberId", memberId);
-      }
+    if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
+      chain.doFilter(request, response);
+      return;
     }
 
+    if (isWhitelisted(uri)) {
+      chain.doFilter(request, response);
+      return;
+    }
+
+    String authHeader = req.getHeader("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      unauthorized(res, "Missing or invalid Authorization header");
+      return; // ★ 체인 중단
+    }
+
+    String token = authHeader.substring(7);
+    if (!jwtProvider.validate(token)) {
+      unauthorized(res, "Invalid or expired token");
+      return; // ★ 체인 중단
+    }
+
+    Long memberId = jwtProvider.getMemberId(token);
+    req.setAttribute("memberId", memberId);
+
     chain.doFilter(request, response);
+  }
+
+  private boolean isWhitelisted(String uri) {
+    for (String pattern : whitelist) {
+      if (matcher.match(pattern, uri)) return true;
+    }
+    return false;
+  }
+
+  private void unauthorized(HttpServletResponse res, String msg) throws IOException {
+    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    res.setContentType("application/json;charset=UTF-8");
+    res.getWriter().write("{\"error\":\"unauthorized\",\"message\":\"" + msg + "\"}");
   }
 }
