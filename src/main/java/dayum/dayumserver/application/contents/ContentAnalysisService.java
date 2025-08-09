@@ -20,6 +20,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.StructuredTaskScope;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,15 +38,17 @@ public class ContentAnalysisService {
   private final ClovaService clovaService;
   private final ObjectMapper objectMapper;
 
-  public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl, File contents, Path workingDir) {
+  public List<ExtractedIngredientData> analyzeIngredients(
+      String contentsUrl, File contents, Path workingDir) {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
       StructuredTaskScope.Subtask<String> ocrTask =
           scope.fork(
-              () -> {
-
-                List<File> frames = frameExtractorService.extractFrames(contents, workingDir);
-                return ocrService.extractTextFromFiles(frames);
-              });
+              () ->
+                  frameExtractorService
+                      .extractFrames(contents, workingDir)
+                      .flatMap(ocrService::extractTextFromFiles, 5)
+                      .collect(Collectors.joining(" "))
+                      .block());
       StructuredTaskScope.Subtask<String> recognizeSpeechTask =
           scope.fork(() -> ncpSpeechClient.recognize(contentsUrl).fullText());
 
@@ -56,28 +60,9 @@ public class ContentAnalysisService {
     }
   }
 
-  private Path createWorkingDirectory() {
-    try {
-      Path workingDir =
-          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-      Files.createDirectory(workingDir);
-      return workingDir;
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   private List<ExtractedIngredientData> extractIngredientsWithAI(
       String subtitleText, String speechText) {
     return parseIngredientsFromJson(clovaService.extractIngredients(subtitleText, speechText));
-  }
-
-  private void deleteWorkingDirectory(Path path) {
-    try {
-      Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
   }
 
   private List<ExtractedIngredientData> parseIngredientsFromJson(String jsonResponse) {
