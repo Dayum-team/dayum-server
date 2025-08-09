@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/auth")
 @RequiredArgsConstructor
-public class NaverLoginController {
+public class LoginController {
 
   private final MemberService memberService;
   private final NaverOAuthClient naverOAuthClient;
