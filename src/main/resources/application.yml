@@ -47,10 +47,10 @@ jwt:
   secret: ${jwt.secret}
 
 apple:
-  team-id: WC5T233HM3
-  client-id: com.dayum.app
-  key-id: FMM3DT22J7
-  private-key-path: src/main/resources/AuthKey_FMM3DT22J7.p8
+  team-id: ${apple.team-id}
+  client-id: ${apple.client-id}
+  key-id: ${apple.key-id}
+  private-key-path: ${apple.private-key-path}
 
 
 ---
