@@ -1,12 +1,12 @@
 package dayum.dayumserver.application.member;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,11 +29,9 @@ public class MemberController {
     }
   }
 
-  @DeleteMapping
-  public ResponseEntity<Boolean> withdraw(@RequestHeader("Authorization") String authHeader) {
-    String token = authHeader.replace("Bearer ", "");
-    Long memberId = jwtProvider.getMemberId(token);
-
+  @DeleteMapping("/api/members/withdraw")
+  public ResponseEntity<Boolean> withdraw(HttpServletRequest request) {
+    Long memberId = (Long) request.getAttribute("memberId");
     boolean result = memberService.withdraw(memberId);
     return ResponseEntity.ok(result);
   }
