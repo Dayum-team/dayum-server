@@ -53,7 +53,11 @@ public class ContentsService {
     List<ExtractedIngredientData> analysisResult =
         contentAnalysisService.analyzeIngredients(contentsUrl);
 
-    List<Ingredient> ingredients = ingredientService.findIngredientsByNames(analysisResult);
+    List<String> ingredientNames = analysisResult.stream()
+        .map(ExtractedIngredientData::name)
+        .toList();
+
+    List<Ingredient> ingredients = ingredientService.findIngredientsByNames(ingredientNames);
 
     return ContentsAnalyzeResponse.from(contentsId, ingredients);
   }

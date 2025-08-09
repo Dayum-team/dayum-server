@@ -21,10 +21,10 @@ public class IngredientService {
     return ingredientRepository.search(keyword).stream().map(IngredientResponse::from).toList();
   }
 
-  public List<Ingredient> findIngredientsByNames(List<ExtractedIngredientData> analysisResult) {
-    return analysisResult.stream()
-        .map(data -> ingredientRepository.searchByName(data.name()))
+  public List<Ingredient> findIngredientsByNames(List<String> ingredientNames) {
+    return ingredientNames.stream()
+        .map(name -> ingredientRepository.findByName(name))
         .flatMap(Optional::stream)
-        .collect(Collectors.toList());
+        .toList();
   }
 }
