@@ -1,7 +1,5 @@
 package dayum.dayumserver.application.contents;
 
-import dayum.dayumserver.application.common.exception.AppException;
-import dayum.dayumserver.application.common.exception.CommonExceptionCode;
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
@@ -11,6 +9,7 @@ import dayum.dayumserver.application.contents.dto.response.ContentsResponse;
 import dayum.dayumserver.application.ingredient.IngredientService;
 import dayum.dayumserver.client.cv.FrameExtractorService;
 import dayum.dayumserver.client.s3.S3ClientService;
+import dayum.dayumserver.common.helper.FileHelper;
 import dayum.dayumserver.domain.contents.Contents;
 import dayum.dayumserver.domain.contents.ContentsIngredient;
 import dayum.dayumserver.domain.contents.ContentsIngredientRepository;
@@ -18,14 +17,9 @@ import dayum.dayumserver.domain.contents.ContentsRepository;
 import dayum.dayumserver.domain.ingredient.Ingredient;
 import dayum.dayumserver.domain.member.MemberRepository;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -68,7 +62,7 @@ public class ContentsService {
     String thumbnailUrl;
     List<ExtractedIngredientData> extractedIngredients;
 
-    Path workingDir = createWorkingDirectory();
+    Path workingDir = FileHelper.createWorkingDirectory();
     try {
       File contentsFile = s3ClientService.downloadFile(contentsUrl, workingDir);
       File thumbnail = frameExtractorService.extractThumbnail(contentsFile, workingDir);
@@ -76,7 +70,7 @@ public class ContentsService {
       extractedIngredients =
           contentAnalysisService.analyzeIngredients(contentsUrl, contentsFile, workingDir);
     } finally {
-      deleteWorkingDirectory(workingDir);
+      FileHelper.deleteWorkingDirectory(workingDir);
     }
 
     var contents =
@@ -121,22 +115,4 @@ public class ContentsService {
     return contentsRepository.save(contents.publish()).url();
   }
 
-  private Path createWorkingDirectory() {
-    try {
-      Path workingDir =
-          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-      Files.createDirectory(workingDir);
-      return workingDir;
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  private void deleteWorkingDirectory(Path path) {
-    try {
-      Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
-  }
 }
