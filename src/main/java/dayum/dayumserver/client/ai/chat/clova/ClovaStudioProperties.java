@@ -38,7 +38,7 @@ public class ClovaStudioProperties {
 
             응답 형식:
             재료를 추출하여 JSON 형식으로 반환하세요.
-            마크다운이나 코드 블록 없이 순수 JSON만 응답하세요
+            무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
             형식: {\\"ingredients\\": [{\\"name\\": \\"재료명\\", \\"quantity\\": \\"양\\"}, ...]}
 
             예시:
@@ -48,6 +48,6 @@ public class ClovaStudioProperties {
                 {"name": "양파", "quantity": "1개"}
               ]
             }
-            """;
+        """;
   }
 }
