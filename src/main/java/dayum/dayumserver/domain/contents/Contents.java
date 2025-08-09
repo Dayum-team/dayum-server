@@ -37,4 +37,16 @@ public record Contents(
   public double calculateFats() {
     return ingredients.stream().mapToDouble(it -> it.ingredient().fats() * it.quantity()).sum();
   }
+
+  public Contents publish() {
+    return Contents.builder()
+        .id(id)
+        .member(member)
+        .thumbnailUrl(null)
+        .url(url)
+        .ingredients(ingredients)
+        .status(ContentStatus.PUBLISHED)
+        .createdAt(createdAt)
+        .build();
+  }
 }

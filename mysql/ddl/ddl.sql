@@ -16,7 +16,7 @@ CREATE TABLE contents
     description   VARCHAR(1024),
     thumbnail_url VARCHAR(255),
     url           VARCHAR(255),
-    status        ENUM('PENDING') NOT NULL,
+    status        ENUM('PENDING', 'PUBLISHED') NOT NULL,
     created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

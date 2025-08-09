@@ -94,6 +94,7 @@ public class ContentsService {
             .toList();
 
     contentsIngredientRepository.saveAll(contentsIngredients);
-    return contents.url();
+
+    return contentsRepository.save(contents.publish()).url();
   }
 }
