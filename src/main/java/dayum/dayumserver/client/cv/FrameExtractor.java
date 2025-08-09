@@ -82,5 +82,3 @@ public class FrameExtractor implements Closeable {
 	} catch (Exception ignore) {}
   }
 }
-
-

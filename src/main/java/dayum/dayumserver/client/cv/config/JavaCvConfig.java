@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class JavaCvConfig {
 
-	@Bean
-	public Java2DFrameConverter converter() {
-		return new Java2DFrameConverter();
-	}
+  @Bean
+  public Java2DFrameConverter converter() {
+    return new Java2DFrameConverter();
+  }
 }
