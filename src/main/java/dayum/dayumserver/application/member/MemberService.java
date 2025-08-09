@@ -59,8 +59,8 @@ public class MemberService {
         switch (provider) {
           case NAVER -> naverOAuthClient.getUserInfo(request.accessToken());
           case APPLE -> {
-            if (request.idToken() != null && !request.idToken().isBlank()) {
-              yield appleAuthService.parseIdTokenToUser(request.idToken());
+            if (request.accessToken() != null && !request.accessToken().isBlank()) {
+              yield appleAuthService.parseIdTokenToUser(request.accessToken());
             }
             if (request.authorizationCode() != null && !request.authorizationCode().isBlank()) {
               AppleTokenResponse tokens =
@@ -86,8 +86,8 @@ public class MemberService {
         switch (provider) {
           case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
           case APPLE -> {
-            if (request.idToken() != null && !request.idToken().isBlank()) {
-              yield appleAuthService.parseIdTokenToUser(request.idToken());
+            if (request.accessToken() != null && !request.accessToken().isBlank()) {
+              yield appleAuthService.parseIdTokenToUser(request.accessToken());
             }
             if (request.authorizationCode() != null && !request.authorizationCode().isBlank()) {
               AppleTokenResponse tokens =

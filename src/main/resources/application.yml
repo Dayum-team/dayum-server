@@ -51,7 +51,8 @@ apple:
   client-id: com.dayum.app
   key-id: FMM3DT22J7
   private-key-path: src/main/resources/AuthKey_FMM3DT22J7.p8
-  
+
+
 ---
 spring:
   config:

@@ -16,8 +16,8 @@ public record Contents(
     ContentStatus status,
     LocalDateTime createdAt) {
 
-  public static Contents createDraft(Member member, String url) {
-    return Contents.builder().member(member).url(url).status(ContentStatus.PENDING).build();
+  public static Contents createDraft(Member member, String url, String thumbnailUrl) {
+    return Contents.builder().member(member).url(url).thumbnailUrl(thumbnailUrl).status(ContentStatus.PENDING).build();
   }
 
   public double calculateCalories() {
@@ -36,5 +36,17 @@ public record Contents(
 
   public double calculateFats() {
     return ingredients.stream().mapToDouble(it -> it.ingredient().fats() * it.quantity()).sum();
+  }
+
+  public Contents publish() {
+    return Contents.builder()
+        .id(id)
+        .member(member)
+        .thumbnailUrl(thumbnailUrl)
+        .url(url)
+        .ingredients(ingredients)
+        .status(ContentStatus.PUBLISHED)
+        .createdAt(createdAt)
+        .build();
   }
 }

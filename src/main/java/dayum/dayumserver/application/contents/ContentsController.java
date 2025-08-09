@@ -2,11 +2,13 @@ package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.response.ApiResponse;
 import dayum.dayumserver.application.common.response.PageResponse;
-import dayum.dayumserver.application.contents.dto.ContentsAnalyzeRequest;
-import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
-import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
-import dayum.dayumserver.application.contents.dto.ContentsResponse;
+import dayum.dayumserver.application.contents.dto.request.ContentsAnalyzeRequest;
+import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
+import dayum.dayumserver.application.contents.dto.response.ContentsAnalyzeResponse;
+import dayum.dayumserver.application.contents.dto.response.ContentsDetailResponse;
+import dayum.dayumserver.application.contents.dto.response.ContentsResponse;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +43,13 @@ public class ContentsController {
   public ApiResponse<ContentsAnalyzeResponse> analyzeContents(
       @RequestBody ContentsAnalyzeRequest request) {
     var analyzeResponse =
-        contentsService.extractIngredientsFromContent(request.contentsUrl(), request.memberId());
+        contentsService.analyze(request.contentsUrl(), request.memberId());
     return ApiResponse.of(analyzeResponse);
+  }
+
+  @PostMapping("/{id}/ingredients")
+  public ApiResponse<String> addIngredients(
+      @PathVariable Long id, @RequestBody ContentsUploadRequest request) {
+    return ApiResponse.of(contentsService.addIngredients(id, request));
   }
 }
