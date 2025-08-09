@@ -2,9 +2,14 @@ package dayum.dayumserver.infrastructure.repository.jpa.entity;
 
 import static jakarta.persistence.ConstraintMode.*;
 
+import java.util.ArrayList;
+
+import dayum.dayumserver.domain.contents.ContentStatus;
 import dayum.dayumserver.infrastructure.repository.jpa.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -14,10 +19,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +29,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "contents")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class ContentsJpaEntity extends BaseEntity {
 
   @Id
@@ -47,19 +52,7 @@ public class ContentsJpaEntity extends BaseEntity {
   private String thumbnailUrl;
   private String url;
 
-  @Builder
-  public ContentsJpaEntity(
-      MemberJpaEntity member,
-      List<ContentsIngredientJpaEntity> ingredients,
-      String title,
-      String description,
-      String thumbnailUrl,
-      String url) {
-    this.member = member;
-    this.ingredients = ingredients;
-    this.title = title;
-    this.description = description;
-    this.thumbnailUrl = thumbnailUrl;
-    this.url = url;
-  }
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ContentStatus status;
 }

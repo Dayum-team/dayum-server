@@ -11,4 +11,6 @@ public interface MemberRepository {
   Optional<Member> findByEmailAndProvider(String email, Oauth2Provider provider);
 
   Optional<Member> findById(Long id);
+
+  Member fetchBy(long memberId);
 }
