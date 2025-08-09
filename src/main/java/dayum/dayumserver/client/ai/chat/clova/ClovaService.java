@@ -36,10 +36,27 @@ public class ClovaService {
             .retrieve()
             .body(ClovaResponse.class);
 
-	  if (response != null) {
-		  return response.result().message().content();
-	  }
-      throw new RuntimeException("Clova Studio chat completion failed");
+    if (response != null && response.result() != null && response.result().message() != null) {
+      String rawContent = response.result().message().content();
+      return extractJsonContent(rawContent);
+    }
+    throw new RuntimeException("Clova Studio chat completion failed");
+  }
+
+  private String extractJsonContent(String rawContent) {
+    if (rawContent == null || rawContent.isBlank()) {
+      return "{}";
+    }
+
+    int firstBraceIndex = rawContent.indexOf('{');
+    int lastBraceIndex = rawContent.lastIndexOf('}');
+
+    if (firstBraceIndex != -1 && lastBraceIndex != -1 && lastBraceIndex > firstBraceIndex) {
+      return rawContent.substring(firstBraceIndex, lastBraceIndex + 1).trim();
+    }
+
+    log.warn("Failed to find valid JSON object in the response: {}", rawContent);
+    return "{}";
   }
 
   private String buildUserPrompt(String ocrText, String speechText) {
