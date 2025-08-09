@@ -24,6 +24,8 @@ public class ClovaService {
   }
 
   public String chatCompletion(String systemMessage, String userMessage) {
+    log.info("System Message: {}", systemMessage);
+    log.info("User Message: {}", userMessage);
     ClovaRequest request = ClovaRequest.of(systemMessage, userMessage);
 
     ClovaResponse response =

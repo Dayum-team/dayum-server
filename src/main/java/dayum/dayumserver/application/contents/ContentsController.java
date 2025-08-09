@@ -43,7 +43,7 @@ public class ContentsController {
   public ApiResponse<ContentsAnalyzeResponse> analyzeContents(
       @RequestBody ContentsAnalyzeRequest request) {
     var analyzeResponse =
-        contentsService.extractIngredientsFromContent(request.contentsUrl(), request.memberId());
+        contentsService.analyze(request.contentsUrl(), request.memberId());
     return ApiResponse.of(analyzeResponse);
   }
 
