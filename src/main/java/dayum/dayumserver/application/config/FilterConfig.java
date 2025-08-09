@@ -18,8 +18,8 @@ public class FilterConfig {
   public FilterRegistrationBean<JwtFilter> jwtFilter() {
     FilterRegistrationBean<JwtFilter> registrationBean = new FilterRegistrationBean<>();
     registrationBean.setFilter(new JwtFilter(jwtProvider));
-    registrationBean.addUrlPatterns("/api/*"); // 필터 적용 경로
-    registrationBean.setOrder(1); // 실행 순서 (낮을수록 먼저 실행)
+    registrationBean.addUrlPatterns("/api/**");
+    registrationBean.setOrder(1);
     return registrationBean;
   }
 }
