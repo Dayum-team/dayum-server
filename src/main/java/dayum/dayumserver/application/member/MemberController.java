@@ -29,7 +29,7 @@ public class MemberController {
     }
   }
 
-  @DeleteMapping("/api/members/withdraw")
+  @DeleteMapping
   public ResponseEntity<Boolean> withdraw(HttpServletRequest request) {
     Long memberId = (Long) request.getAttribute("memberId");
     boolean result = memberService.withdraw(memberId);
