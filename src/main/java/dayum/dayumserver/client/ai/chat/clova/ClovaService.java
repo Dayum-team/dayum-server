@@ -2,13 +2,11 @@ package dayum.dayumserver.client.ai.chat.clova;
 
 import dayum.dayumserver.client.ai.chat.clova.dto.ClovaRequest;
 import dayum.dayumserver.client.ai.chat.clova.dto.ClovaResponse;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +22,6 @@ public class ClovaService {
   }
 
   public String chatCompletion(String systemMessage, String userMessage) {
-    log.info("System Message: {}", systemMessage);
     log.info("User Message: {}", userMessage);
     ClovaRequest request = ClovaRequest.of(systemMessage, userMessage);
 
@@ -38,10 +35,11 @@ public class ClovaService {
             .retrieve()
             .body(ClovaResponse.class);
 
-	  if (response != null) {
-		  return response.result().message().content();
-	  }
-      throw new RuntimeException("Clova Studio chat completion failed");
+    if (response != null) {
+      log.info("Response: {}", response.result().message().content());
+      return response.result().message().content();
+    }
+    throw new RuntimeException("Clova Studio chat completion failed");
   }
 
   private String buildUserPrompt(String ocrText, String speechText) {
