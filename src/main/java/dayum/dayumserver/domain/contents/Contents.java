@@ -17,7 +17,7 @@ public record Contents(
     LocalDateTime createdAt) {
 
   public static Contents createDraft(Member member, String url, String thumbnailUrl) {
-    return Contents.builder().member(member).url(url).status(ContentStatus.PENDING).build();
+    return Contents.builder().member(member).url(url).thumbnailUrl(thumbnailUrl).status(ContentStatus.PENDING).build();
   }
 
   public double calculateCalories() {
