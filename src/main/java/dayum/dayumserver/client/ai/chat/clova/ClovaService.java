@@ -24,7 +24,6 @@ public class ClovaService {
   }
 
   public String chatCompletion(String systemMessage, String userMessage) {
-    log.info("System Message: {}", systemMessage);
     log.info("User Message: {}", userMessage);
     ClovaRequest request = ClovaRequest.of(systemMessage, userMessage);
 
@@ -40,6 +39,7 @@ public class ClovaService {
 
     if (response != null && response.result() != null && response.result().message() != null) {
       String rawContent = response.result().message().content();
+      log.info("Clova Studio response: {}", rawContent);
       return extractJsonContent(rawContent);
     }
     throw new RuntimeException("Clova Studio chat completion failed");
