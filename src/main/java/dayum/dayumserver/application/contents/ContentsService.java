@@ -5,10 +5,8 @@ import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.ContentsResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
-import dayum.dayumserver.application.ingredient.IngredientService;
 import dayum.dayumserver.domain.contents.Contents;
 import dayum.dayumserver.domain.contents.ContentsRepository;
-import dayum.dayumserver.domain.ingredient.Ingredient;
 import dayum.dayumserver.domain.member.MemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ public class ContentsService {
   private final ContentsRepository contentsRepository;
   private final MemberRepository memberRepository;
   private final ContentAnalysisService contentAnalysisService;
-  private final IngredientService ingredientService;
 
   public PageResponse<ContentsResponse> retrieveNextPage(Long memberId, long cursorId, int size) {
     var contentsList =
@@ -48,17 +45,13 @@ public class ContentsService {
   public ContentsAnalyzeResponse extractIngredientsFromContent(String contentsUrl, Long memberId) {
 
     var contents = Contents.createDraft(memberRepository.fetchBy(memberId), contentsUrl);
-    Long contentsId = contentsRepository.save(contents).id();
+    contentsRepository.save(contents);
 
     List<ExtractedIngredientData> analysisResult =
         contentAnalysisService.analyzeIngredients(contentsUrl);
 
-    List<String> ingredientNames = analysisResult.stream()
-        .map(ExtractedIngredientData::name)
-        .toList();
+    // TODO 추출된 재료와 DB 데이터 매핑후 반환
 
-    List<Ingredient> ingredients = ingredientService.findIngredientsByNames(ingredientNames);
-
-    return ContentsAnalyzeResponse.from(contentsId, ingredients);
+    return new ContentsAnalyzeResponse();
   }
 }
