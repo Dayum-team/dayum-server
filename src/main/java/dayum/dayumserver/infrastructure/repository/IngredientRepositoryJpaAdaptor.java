@@ -27,7 +27,14 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
   }
 
   @Override
-  public Optional<Ingredient> searchByName(String name) {
+  public List<Ingredient> findAllBy(List<Long> ingredientIds) {
+    return ingredientJpaRepository.findAllById(ingredientIds).stream()
+        .map(ingredientMapper::mapToDomainEntity)
+        .toList();
+  }
+
+  @Override
+  public Optional<Ingredient> findByName(String name) {
     return ingredientJpaRepository
         .findFirstByNameContainingIgnoreCase(name)
         .map(ingredientMapper::mapToDomainEntity);

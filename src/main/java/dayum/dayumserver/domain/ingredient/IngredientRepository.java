@@ -8,4 +8,6 @@ public interface IngredientRepository {
   List<Ingredient> search(String keyword);
 
   Optional<Ingredient> findByName(String name);
+
+  List<Ingredient> findAllBy(List<Long> ingredientIds);
 }

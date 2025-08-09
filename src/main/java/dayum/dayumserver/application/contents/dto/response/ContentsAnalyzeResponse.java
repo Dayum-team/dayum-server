@@ -1,4 +1,4 @@
-package dayum.dayumserver.application.contents.dto;
+package dayum.dayumserver.application.contents.dto.response;
 
 import java.util.List;
 import java.util.stream.Collectors;

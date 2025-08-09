@@ -1,16 +1,22 @@
 package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.response.PageResponse;
-import dayum.dayumserver.application.contents.dto.ContentsAnalyzeResponse;
-import dayum.dayumserver.application.contents.dto.ContentsDetailResponse;
-import dayum.dayumserver.application.contents.dto.ContentsResponse;
+import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
+import dayum.dayumserver.application.contents.dto.response.ContentsAnalyzeResponse;
+import dayum.dayumserver.application.contents.dto.response.ContentsDetailResponse;
+import dayum.dayumserver.application.contents.dto.response.ContentsResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.application.ingredient.IngredientService;
 import dayum.dayumserver.domain.contents.Contents;
+import dayum.dayumserver.domain.contents.ContentsIngredient;
+import dayum.dayumserver.domain.contents.ContentsIngredientRepository;
 import dayum.dayumserver.domain.contents.ContentsRepository;
 import dayum.dayumserver.domain.ingredient.Ingredient;
 import dayum.dayumserver.domain.member.MemberRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +28,7 @@ public class ContentsService {
   private final MemberRepository memberRepository;
   private final ContentAnalysisService contentAnalysisService;
   private final IngredientService ingredientService;
+  private final ContentsIngredientRepository contentsIngredientRepository;
 
   public PageResponse<ContentsResponse> retrieveNextPage(Long memberId, long cursorId, int size) {
     var contentsList =
@@ -53,12 +60,43 @@ public class ContentsService {
     List<ExtractedIngredientData> analysisResult =
         contentAnalysisService.analyzeIngredients(contentsUrl);
 
-    List<String> ingredientNames = analysisResult.stream()
-        .map(ExtractedIngredientData::name)
-        .toList();
+    List<String> ingredientNames =
+        analysisResult.stream().map(ExtractedIngredientData::name).toList();
 
     List<Ingredient> ingredients = ingredientService.findIngredientsByNames(ingredientNames);
 
     return ContentsAnalyzeResponse.from(contentsId, ingredients);
+  }
+
+  public String addIngredients(Long contentsId, ContentsUploadRequest contentsUploadRequest) {
+    var contents = contentsRepository.fetchBy(contentsId);
+
+    List<Long> ingredientIds =
+        contentsUploadRequest.ingredients().stream()
+            .map(ContentsUploadRequest.IngredientDto::id)
+            .toList();
+
+    List<Ingredient> ingredients = ingredientService.findAllByIds(ingredientIds);
+    if (ingredients.size() != ingredientIds.size()) {
+      throw new IllegalArgumentException("일부 재료를 찾을 수 없습니다");
+    }
+
+    Map<Long, Long> quantityMap =
+        contentsUploadRequest.ingredients().stream()
+            .collect(
+                Collectors.toMap(
+                    ContentsUploadRequest.IngredientDto::id,
+                    ContentsUploadRequest.IngredientDto::quantity));
+
+    List<ContentsIngredient> contentsIngredients =
+        ingredients.stream()
+            .map(
+                ingredient ->
+                    ContentsIngredient.from(contents, ingredient, quantityMap.get(ingredient.id())))
+            .toList();
+
+    contentsIngredientRepository.saveAll(contentsIngredients);
+
+    return contentsRepository.save(contents.publish()).url();
   }
 }
