@@ -6,7 +6,6 @@ CREATE TABLE members (
                            `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '이름',
                            `nickname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '닉네임',
                            `profile_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '프로필 이미지',
-                           `introduce` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '자기소개',
                            `bio` varchar(1000) COLLATE utf8mb4_general_ci DEFAULT NULL,
                            `oauth2provider` enum('APPLE','NAVER') COLLATE utf8mb4_general_ci NOT NULL,
                            `deleted` bit(1) NOT NULL,
