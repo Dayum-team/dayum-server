@@ -29,10 +29,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ContentAnalysisService {
 
-  private final S3ClientService s3ClientService;
-  private final FrameExtractorService frameExtractorService;
-  private final OcrService ocrService;
   private final NcpSpeechClient ncpSpeechClient;
+  private final SubtitleAnalysisService subtitleAnalysisService;
   private final ClovaService clovaService;
   private final ObjectMapper objectMapper;
 
@@ -42,11 +40,8 @@ public class ContentAnalysisService {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
       StructuredTaskScope.Subtask<String> ocrTask =
           scope.fork(
-              () -> {
-                File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
-                List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
-                return ocrService.extractTextFromFiles(frames);
-              });
+              () -> subtitleAnalysisService.extractSubtitleFromVideo(contentsUrl, workingDir));
+
       StructuredTaskScope.Subtask<String> recognizeSpeechTask =
           scope.fork(() -> ncpSpeechClient.recognize(contentsUrl).fullText());
 
