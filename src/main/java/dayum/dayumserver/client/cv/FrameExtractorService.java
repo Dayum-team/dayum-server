@@ -93,29 +93,27 @@ public class FrameExtractorService {
     files.stream().filter(file -> file != null && file.exists()).forEach(File::delete);
   }
 
-  private static BufferedImage centerCrop(BufferedImage src) {
+  private static BufferedImage centerCrop(BufferedImage image) {
     double ratio = 0.6;
-    int w = (int) Math.round(src.getWidth() * ratio);
-    int h = (int) Math.round(src.getHeight() * ratio);
-    int x = (src.getWidth() - w) / 2;
-    int y = (src.getHeight() - h) / 2;
-    return src.getSubimage(x, y, w, h);
+    int maxWidth = (int) Math.round(image.getWidth() * ratio);
+    int maxHeight = (int) Math.round(image.getHeight() * ratio);
+    int minWidth = (image.getWidth() - maxWidth) / 2;
+    int minHeight = (image.getHeight() - maxHeight) / 2;
+    return image.getSubimage(minWidth, minHeight, maxWidth, maxHeight);
   }
 
-  private static double meanLuma(BufferedImage img) {
+  private static double meanLuma(BufferedImage image) {
     long sum = 0;
-    int w = img.getWidth(), h = img.getHeight();
-    for (int y = 0; y < h; y++) {
-      for (int x = 0; x < w; x++) {
-        int rgb = img.getRGB(x, y);
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = rgb & 0xFF;
-        int yv = (int) Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    for (int yPoint = 0; yPoint < image.getHeight(); yPoint++) {
+      for (int xPoint = 0; xPoint < image.getWidth(); xPoint++) {
+        int rgb = image.getRGB(xPoint, yPoint);
+        int red = (rgb >> 16) & 0xFF;
+        int green = (rgb >> 8) & 0xFF;
+        int blue = rgb & 0xFF;
+        int yv = (int) Math.round(0.299 * red + 0.587 * green + 0.114 * blue);
         sum += yv;
       }
     }
-    return (double) sum / (w * h);
+    return (double) sum / (image.getWidth() * image.getHeight());
   }
-
 }
