@@ -7,7 +7,6 @@ spring:
     name: dayum-server
   profiles:
     active: local
-
   cloud.aws:
     region:
       static: ap-northeast-2
@@ -44,6 +43,8 @@ ncp:
     base-url: ${ncp.clova.base-url}
     api-key: ${ncp.clova.api-key}
 
+jwt:
+  secret: ${jwt.secret}
 ---
 spring:
   config:
