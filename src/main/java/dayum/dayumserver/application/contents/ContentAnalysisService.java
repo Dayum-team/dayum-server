@@ -36,15 +36,13 @@ public class ContentAnalysisService {
   private final ClovaService clovaService;
   private final ObjectMapper objectMapper;
 
-  public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl) {
-    Path workingDir = createWorkingDirectory();
-
+  public List<ExtractedIngredientData> analyzeIngredients(String contentsUrl, File contents, Path workingDir) {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
       StructuredTaskScope.Subtask<String> ocrTask =
           scope.fork(
               () -> {
-                File downloaded = s3ClientService.downloadFile(contentsUrl, workingDir);
-                List<File> frames = frameExtractorService.extractFrames(downloaded, workingDir);
+
+                List<File> frames = frameExtractorService.extractFrames(contents, workingDir);
                 return ocrService.extractTextFromFiles(frames);
               });
       StructuredTaskScope.Subtask<String> recognizeSpeechTask =
@@ -55,8 +53,6 @@ public class ContentAnalysisService {
       return extractIngredientsWithAI(ocrTask.get(), recognizeSpeechTask.get());
     } catch (Exception e) {
       throw new RuntimeException("Ingredient analysis failed", e);
-    } finally {
-      deleteWorkingDirectory(workingDir);
     }
   }
 

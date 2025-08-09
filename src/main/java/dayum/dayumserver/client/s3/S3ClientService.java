@@ -68,6 +68,22 @@ public class S3ClientService {
     }
   }
 
+  public String uploadFile(String prefix, File file, Path workingDir) {
+    String ext = file.getName().substring(file.getName().lastIndexOf("."));
+    UUID uuid = UUID.randomUUID();
+
+    String objectKey = prefix + "/" + uuid + ext;
+    PutObjectRequest request =
+        PutObjectRequest.builder()
+            .bucket(ncpProperties.getS3Bucket())
+            .key(objectKey)
+            .acl(ObjectCannedACL.PUBLIC_READ)
+            .build();
+    s3Client.putObject(request, RequestBody.fromFile(file));
+    return String.format(
+        "%s/%s/%s", ncpProperties.getS3Endpoint(), ncpProperties.getS3Bucket(), objectKey);
+  }
+
   // 전체 URL에서 Object Storage의 객체 키만 추출
   private String extractObjectKeyFromUrl(String fullUrl) {
     String bucketName = ncpProperties.getS3Bucket();
