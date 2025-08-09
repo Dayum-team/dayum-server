@@ -56,33 +56,16 @@ public class ContentAnalysisService {
     }
   }
 
-  private Path createWorkingDirectory() {
-    try {
-      Path workingDir =
-          Paths.get(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString());
-      Files.createDirectory(workingDir);
-      return workingDir;
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   private List<ExtractedIngredientData> extractIngredientsWithAI(
       String subtitleText, String speechText) {
     return parseIngredientsFromJson(clovaService.extractIngredients(subtitleText, speechText));
   }
 
-  private void deleteWorkingDirectory(Path path) {
-    try {
-      Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
-    } catch (IOException e) {
-      throw new AppException(CommonExceptionCode.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   private List<ExtractedIngredientData> parseIngredientsFromJson(String jsonResponse) {
     try {
-      JsonNode root = objectMapper.readTree(jsonResponse);
+      var startIndex = jsonResponse.indexOf('{');
+      var endIndex = jsonResponse.lastIndexOf('}');
+      JsonNode root = objectMapper.readTree(jsonResponse.substring(startIndex, endIndex + 1));
       JsonNode ingredientsNode = root.get("ingredients");
 
       return objectMapper.convertValue(
