@@ -1,4 +1,4 @@
-package dayum.dayumserver.application.contents.dto;
+package dayum.dayumserver.application.contents.dto.response;
 
 import dayum.dayumserver.domain.contents.Contents;
 import java.time.LocalDateTime;
