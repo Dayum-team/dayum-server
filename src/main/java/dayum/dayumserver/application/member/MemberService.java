@@ -1,8 +1,5 @@
 package dayum.dayumserver.application.member;
 
-import static dayum.dayumserver.domain.member.Oauth2Provider.APPLE;
-import static dayum.dayumserver.domain.member.Oauth2Provider.NAVER;
-
 import dayum.dayumserver.application.member.dto.AppleTokenResponse;
 import dayum.dayumserver.application.member.dto.LoginRequest;
 import dayum.dayumserver.application.member.dto.LoginResponse;
@@ -64,7 +61,6 @@ public class MemberService {
         yield naverOAuthClient.getUserInfo(accessTokenOrIdToken);
       }
       case APPLE -> {
-        // 규칙: Apple은 accessToken 필드에 id_token이 들어올 수 있음(팀 컨벤션)
         if (!isBlank(accessTokenOrIdToken)) {
           yield appleAuthService.parseIdTokenToUser(accessTokenOrIdToken);
         }
