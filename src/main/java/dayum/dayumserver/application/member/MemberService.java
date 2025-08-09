@@ -3,9 +3,9 @@ package dayum.dayumserver.application.member;
 import static dayum.dayumserver.domain.member.Oauth2Provider.APPLE;
 import static dayum.dayumserver.domain.member.Oauth2Provider.NAVER;
 
-import dayum.dayumserver.application.member.dto.LoginRequest;
 import dayum.dayumserver.application.member.dto.LoginResponse;
 import dayum.dayumserver.application.member.dto.OAuthUserInfo;
+import dayum.dayumserver.application.member.dto.RegisterRequest;
 import dayum.dayumserver.client.s3.oauth2.naver.NaverOAuthClient;
 import dayum.dayumserver.domain.member.Member;
 import dayum.dayumserver.domain.member.MemberRepository;
@@ -50,7 +50,23 @@ public class MemberService {
     return memberRepository.existsByNickname(nickname);
   }
 
-  public LoginResponse login(LoginRequest request, Oauth2Provider provider) {
+  public Optional<LoginResponse> login(String oauthAccessToken, Oauth2Provider provider) {
+
+    OAuthUserInfo userInfo =
+        switch (provider) {
+          case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
+          case APPLE -> throw new UnsupportedOperationException("Apple not implemented yet");
+        };
+    return memberRepository
+        .findByEmailAndProvider(userInfo.email(), provider)
+        .filter(m -> !m.deleted())
+        .map(
+            m ->
+                new LoginResponse(
+                    jwtProvider.createToken(m.id()), jwtProvider.createRefreshToken(m.id())));
+  }
+
+  public LoginResponse signup(RegisterRequest request, Oauth2Provider provider) {
     String oauthAccessToken = request.accessToken(); // OAuth2 provider token
 
     OAuthUserInfo userInfo =
