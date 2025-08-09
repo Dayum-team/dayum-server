@@ -35,15 +35,8 @@ public class MemberService {
         .orElseGet(
             () ->
                 memberRepository.save(
-                    Member.builder()
-                        .email(user.email())
-                        .name(user.name())
-                        .nickname(nickname)
-                        .profileImage(profileImage)
-                        .oauth2Provider(provider)
-                        .bio(bio)
-                        .deleted(false)
-                        .build()));
+                    Member.createOAuthMember(
+                        user.email(), user.name(), nickname, profileImage, bio, provider)));
   }
 
   public boolean isNicknameDuplicated(String nickname) {

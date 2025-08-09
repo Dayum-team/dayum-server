@@ -21,12 +21,13 @@ public class AppleAuthService {
   @Value("${apple.client-id}")
   private String clientId;
 
+  private final AppleJwtUtil appleJwtUtil;
   private final RestClient restClient;
 
   public AppleTokenResponse exchangeCodeForTokens(String authorizationCode) {
     final String clientSecret;
     try {
-      clientSecret = AppleJwtUtil.createClientSecret();
+      clientSecret = appleJwtUtil.createClientSecret();
     } catch (Exception e) {
       throw new IllegalStateException("Failed to create Apple client_secret", e);
     }

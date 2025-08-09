@@ -28,4 +28,22 @@ public record Member(
         .deletedAt(LocalDateTime.now())
         .build();
   }
+
+  public static Member createOAuthMember(
+      String email,
+      String name,
+      String nickname,
+      String profileImage,
+      String bio,
+      Oauth2Provider provider) {
+    return Member.builder()
+        .email(email)
+        .name(name)
+        .nickname(nickname)
+        .profileImage(profileImage)
+        .oauth2Provider(provider)
+        .bio(bio)
+        .deleted(false)
+        .build();
+  }
 }
