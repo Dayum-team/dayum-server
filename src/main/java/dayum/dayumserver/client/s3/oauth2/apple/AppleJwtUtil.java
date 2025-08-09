@@ -28,8 +28,8 @@ public class AppleJwtUtil {
   @Value("${apple.key-id}")
   private String keyId;
 
-  @Value("${apple.private-key-path}")
-  private String privateKeyPath;
+  @Value("${apple.private-key}")
+  private String privateKey;
 
   private final ResourceLoader resourceLoader;
 
@@ -40,7 +40,7 @@ public class AppleJwtUtil {
   public String createClientSecret() throws Exception {
     // 1) .p8 키 로드 (classpath:, file: 모두 지원)
     String privateKeyPem =
-        loadPem(privateKeyPath)
+        privateKey
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")
             .replaceAll("\\s", "");
