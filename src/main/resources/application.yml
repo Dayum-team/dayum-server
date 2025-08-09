@@ -50,7 +50,6 @@ apple:
   team-id: ${apple.team-id}
   client-id: ${apple.client-id}
   key-id: ${apple.key-id}
-  private-key-path: ${apple.private-key-path}
   private-key: ${apple.private-key}
 
 
