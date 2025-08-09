@@ -27,6 +27,37 @@ public class FrameExtractorService {
 
   private final Java2DFrameConverter converter = new Java2DFrameConverter();
 
+  public File extractThumbnail(File videoFile, Path workingDir) {
+    try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoFile)) {
+      grabber.setOption("skip_frame", "nokey");
+      grabber.start();
+
+      final int MAX_KEYFRAMES = 40;
+      final int MIN_MEAN_LUMA = 20;
+      int seen = 0;
+      Frame frame;
+
+      while ((frame = grabber.grabImage()) != null && seen < MAX_KEYFRAMES) {
+        BufferedImage bufferedImage = converter.convert(frame);
+        if (bufferedImage == null) { seen++; continue; }
+
+        double mean = meanLuma(centerCrop(bufferedImage));
+        if (mean >= MIN_MEAN_LUMA) {
+            String fileName = STR."\{FRAME_FILE_PREFIX}\{frame.timestamp}.\{FRAME_FILE_EXTENSION}";
+            Path outputPath = workingDir.resolve(fileName);
+            File outputFile = outputPath.toFile();
+
+            ImageIO.write(bufferedImage, FRAME_FILE_EXTENSION, outputFile);
+            return outputFile;
+          }
+        seen++;
+      }
+      throw new IOException("No suitable frame found.");
+    } catch (IOException e) {
+      throw new AppException(CommonExceptionCode.FRAME_EXTRACTION_FAILED);
+    }
+  }
+
   public List<File> extractFrames(File videoFile, Path workingDir) {
     List<File> frameFiles = new ArrayList<>();
 
@@ -44,7 +75,7 @@ public class FrameExtractorService {
           BufferedImage bufferedImage = converter.convert(frame);
           if (bufferedImage != null) {
             int frameIndex = frameCount / frameInterval;
-            String fileName = FRAME_FILE_PREFIX + frameIndex + "." + FRAME_FILE_EXTENSION;
+            String fileName = STR."\{FRAME_FILE_PREFIX}\{frameIndex}.\{FRAME_FILE_EXTENSION}";
             Path outputPath = workingDir.resolve(fileName);
             File outputFile = outputPath.toFile();
 
@@ -65,4 +96,30 @@ public class FrameExtractorService {
   private void cleanupFiles(List<File> files) {
     files.stream().filter(file -> file != null && file.exists()).forEach(File::delete);
   }
+
+  private static BufferedImage centerCrop(BufferedImage src) {
+    double ratio = 0.6;
+    int w = (int) Math.round(src.getWidth() * ratio);
+    int h = (int) Math.round(src.getHeight() * ratio);
+    int x = (src.getWidth() - w) / 2;
+    int y = (src.getHeight() - h) / 2;
+    return src.getSubimage(x, y, w, h);
+  }
+
+  private static double meanLuma(BufferedImage img) {
+    long sum = 0;
+    int w = img.getWidth(), h = img.getHeight();
+    for (int y = 0; y < h; y++) {
+      for (int x = 0; x < w; x++) {
+        int rgb = img.getRGB(x, y);
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        int yv = (int) Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+        sum += yv;
+      }
+    }
+    return (double) sum / (w * h);
+  }
+
 }

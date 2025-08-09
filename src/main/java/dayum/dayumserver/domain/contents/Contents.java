@@ -16,7 +16,7 @@ public record Contents(
     ContentStatus status,
     LocalDateTime createdAt) {
 
-  public static Contents createDraft(Member member, String url) {
+  public static Contents createDraft(Member member, String url, String thumbnailUrl) {
     return Contents.builder().member(member).url(url).status(ContentStatus.PENDING).build();
   }
 
