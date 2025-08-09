@@ -5,6 +5,8 @@ import dayum.dayumserver.domain.ingredient.IngredientRepository;
 import dayum.dayumserver.infrastructure.repository.jpa.repository.IngredientJpaRepository;
 import dayum.dayumserver.infrastructure.repository.mapper.IngredientMapper;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Repository;
@@ -22,5 +24,12 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
     return ingredientJpaRepository.findAllByNameLike("%" + keyword + "%", Limit.of(10)).stream()
         .map(ingredientMapper::mapToDomainEntity)
         .toList();
+  }
+
+  @Override
+  public Optional<Ingredient> searchByName(String name) {
+    return ingredientJpaRepository
+        .findFirstByNameContainingIgnoreCase(name)
+        .map(ingredientMapper::mapToDomainEntity);
   }
 }
