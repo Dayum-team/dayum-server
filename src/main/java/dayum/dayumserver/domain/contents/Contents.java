@@ -42,7 +42,7 @@ public record Contents(
     return Contents.builder()
         .id(id)
         .member(member)
-        .thumbnailUrl(null)
+        .thumbnailUrl(thumbnailUrl)
         .url(url)
         .ingredients(ingredients)
         .status(ContentStatus.PUBLISHED)

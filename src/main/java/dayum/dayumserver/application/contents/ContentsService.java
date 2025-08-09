@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -75,22 +76,23 @@ public class ContentsService {
             .map(ContentsUploadRequest.IngredientDto::id)
             .toList();
 
-    Map<Long, Ingredient> ingredientMap =
-        ingredientService.findAllByIds(ingredientIds).stream()
-            .collect(Collectors.toMap(Ingredient::id, Function.identity()));
+    List<Ingredient> ingredients = ingredientService.findAllByIds(ingredientIds);
+    if (ingredients.size() != ingredientIds.size()) {
+      throw new IllegalArgumentException("일부 재료를 찾을 수 없습니다");
+    }
+
+    Map<Long, Long> quantityMap =
+        contentsUploadRequest.ingredients().stream()
+            .collect(
+                Collectors.toMap(
+                    ContentsUploadRequest.IngredientDto::id,
+                    ContentsUploadRequest.IngredientDto::quantity));
 
     List<ContentsIngredient> contentsIngredients =
-        contentsUploadRequest.ingredients().stream()
+        ingredients.stream()
             .map(
                 ingredient ->
-                    ContentsIngredient.from(
-                        contents,
-                        Optional.ofNullable(ingredientMap.get(ingredient.id()))
-                            .orElseThrow(
-                                () ->
-                                    new IllegalArgumentException(
-                                        "재료를 찾을 수 없습니다: " + ingredient.id())),
-                        ingredient.quantity()))
+                    ContentsIngredient.from(contents, ingredient, quantityMap.get(ingredient.id())))
             .toList();
 
     contentsIngredientRepository.saveAll(contentsIngredients);
