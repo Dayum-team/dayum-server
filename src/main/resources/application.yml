@@ -45,6 +45,14 @@ ncp:
 
 jwt:
   secret: ${jwt.secret}
+
+apple:
+  team-id: ${apple.team-id}
+  client-id: ${apple.client-id}
+  key-id: ${apple.key-id}
+  private-key: ${apple.private-key}
+
+
 ---
 spring:
   config:

@@ -41,13 +41,13 @@ public class JwtFilter implements Filter {
     String authHeader = req.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       unauthorized(res, "Missing or invalid Authorization header");
-      return; // ★ 체인 중단
+      return;
     }
 
     String token = authHeader.substring(7);
     if (!jwtProvider.validate(token)) {
       unauthorized(res, "Invalid or expired token");
-      return; // ★ 체인 중단
+      return;
     }
 
     Long memberId = jwtProvider.getMemberId(token);
