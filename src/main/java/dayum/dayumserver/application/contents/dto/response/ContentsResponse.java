@@ -14,8 +14,8 @@ public record ContentsResponse(
   public static ContentsResponse from(Contents contents) {
     return new ContentsResponse(
         contents.id(),
-        contents.thumbnailUrl(),
         contents.url(),
+        contents.thumbnailUrl(),
         contents.calculateCalories(),
         contents.calculateCarbohydrates(),
         contents.calculateProteins(),
