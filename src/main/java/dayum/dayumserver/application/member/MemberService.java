@@ -59,7 +59,7 @@ public class MemberService {
         }
         if (!isBlank(authorizationCode)) {
           AppleTokenResponse tokens = appleAuthService.exchangeCodeForTokens(authorizationCode);
-          yield appleAuthService.parseIdTokenToUser(tokens.id_token());
+          yield appleAuthService.parseIdTokenToUser(tokens.idToken());
         }
         throw new IllegalArgumentException(
             "APPLE requires id_token (in accessToken) or authorizationCode");

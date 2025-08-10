@@ -1,8 +1,8 @@
 package dayum.dayumserver.application.member.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record AppleTokenResponse(
-    String access_token,
-    String expires_in,
-    String id_token,
-    String refresh_token,
-    String token_type) {}
+    String accessToken, String expiresIn, String idToken, String refreshToken, String tokenType) {}
