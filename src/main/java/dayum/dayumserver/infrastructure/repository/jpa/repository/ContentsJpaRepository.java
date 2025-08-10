@@ -19,7 +19,7 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
           + "LEFT JOIN FETCH contents.ingredients ci "
           + "LEFT JOIN FETCH ci.ingredient "
           + "WHERE contents.member.id = :memberId "
-          + "AND contents.status == 'PUBLISHED' "
+          + "AND contents.status = 'PUBLISHED' "
           + "AND contents.id >= :cursorId "
           + "ORDER BY contents.id")
   List<ContentsJpaEntity> findNextPageByMember(
@@ -32,7 +32,7 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
           + "LEFT JOIN FETCH contents.ingredients ci "
           + "LEFT JOIN FETCH ci.ingredient "
           + "WHERE contents.id >= :cursorId "
-          + "AND contents.status == 'PUBLISHED' "
+          + "AND contents.status = 'PUBLISHED' "
           + "ORDER BY contents.id")
   List<ContentsJpaEntity> findNextPage(@Param("cursorId") long cursorId, Pageable page);
 
