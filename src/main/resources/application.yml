@@ -2,10 +2,6 @@
 server:
   port: ${APP_PORT:8080}
 
-sentry:
-  dsn: https://6663bedce48b5c1990a24f2d97404de8@o4509825044512768.ingest.us.sentry.io/4509825108541440
-  send-default-pii: true
-
 spring:
   application:
     name: dayum-server
@@ -80,6 +76,10 @@ spring:
     username: ${mysql.username}
     password: ${mysql.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+sentry:
+  dsn: https://6663bedce48b5c1990a24f2d97404de8@o4509825044512768.ingest.us.sentry.io/4509825108541440
+  send-default-pii: true
 
 ncp:
   s3-bucket: dayum2-prod
