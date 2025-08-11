@@ -3,7 +3,7 @@ server:
   port: ${APP_PORT:8080}
 
 sentry:
-  dsn: https://54cc2c401f74535cb4023a462b030af4@o4509825044512768.ingest.us.sentry.io/4509825087111168
+  dsn: https://6663bedce48b5c1990a24f2d97404de8@o4509825044512768.ingest.us.sentry.io/4509825108541440
   send-default-pii: true
 
 spring:
