@@ -2,6 +2,10 @@
 server:
   port: ${APP_PORT:8080}
 
+sentry:
+  dsn: https://e4b493056f71bb959603d500207e88e4@o4509824981467136.ingest.us.sentry.io/4509825001848832
+  send-default-pii: true
+  
 spring:
   application:
     name: dayum-server
