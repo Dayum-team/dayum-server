@@ -79,7 +79,6 @@ dependencies {
 
 sentry {
     includeSourceContext = true
-
     org = "ch4njun"
     projectName = "dayum"
     authToken = System.getenv("SENTRY_AUTH_TOKEN")
