@@ -1,4 +1,4 @@
-package dayum.dayumserver.application.config;
+package dayum.dayumserver.application.web.filter;
 
 import dayum.dayumserver.application.member.JwtProvider;
 import jakarta.servlet.*;
@@ -7,17 +7,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
+@Component
 @RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
   private final JwtProvider jwtProvider;
   private final AntPathMatcher matcher = new AntPathMatcher();
-
-  private final List<String> whitelist =
-      List.of(
-          "/", "/health", "/docs/**", "/swagger-ui/**", "/v3/api-docs/**", "/login/**", "/auth/**");
+  private static final List<String> TOKEN_AUTHENTICATION_WHITELIST =
+      List.of("/health", "/auth/**", "/api/contents/**");
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -41,13 +41,13 @@ public class JwtFilter implements Filter {
     String authHeader = req.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       unauthorized(res, "Missing or invalid Authorization header");
-      return; // ★ 체인 중단
+      return;
     }
 
     String token = authHeader.substring(7);
     if (!jwtProvider.validate(token)) {
       unauthorized(res, "Invalid or expired token");
-      return; // ★ 체인 중단
+      return;
     }
 
     Long memberId = jwtProvider.getMemberId(token);
@@ -57,7 +57,7 @@ public class JwtFilter implements Filter {
   }
 
   private boolean isWhitelisted(String uri) {
-    for (String pattern : whitelist) {
+    for (String pattern : TOKEN_AUTHENTICATION_WHITELIST) {
       if (matcher.match(pattern, uri)) return true;
     }
     return false;

@@ -2,7 +2,6 @@ package dayum.dayumserver.common.helper;
 
 import dayum.dayumserver.application.common.exception.AppException;
 import dayum.dayumserver.application.common.exception.CommonExceptionCode;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.UUID;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
