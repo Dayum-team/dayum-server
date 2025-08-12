@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
   private final MemberService memberService;
-  private final NaverOAuthClient naverOAuthClient;
-  private final JwtProvider jwtProvider;
 
   @PostMapping("/signup/{provider}")
   public ResponseEntity<LoginResponse> login(

@@ -4,6 +4,7 @@ import static dayum.dayumserver.domain.member.Oauth2Provider.APPLE;
 import static dayum.dayumserver.domain.member.Oauth2Provider.NAVER;
 
 import dayum.dayumserver.application.member.dto.LoginResponse;
+import dayum.dayumserver.application.member.dto.MemberProfileResponse;
 import dayum.dayumserver.application.member.dto.OAuthUserInfo;
 import dayum.dayumserver.application.member.dto.RegisterRequest;
 import dayum.dayumserver.client.s3.oauth2.naver.NaverOAuthClient;
@@ -102,5 +103,9 @@ public class MemberService {
 
     memberRepository.save(member.markAsDeleted());
     return true;
+  }
+
+  public MemberProfileResponse getMemberProfile(Long memberId) {
+    return MemberProfileResponse.from(memberRepository.fetchBy(memberId));
   }
 }
