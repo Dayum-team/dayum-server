@@ -1,10 +1,9 @@
 package dayum.dayumserver.domain.contents;
 
 import dayum.dayumserver.domain.member.Member;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record Contents(
@@ -48,5 +47,8 @@ public record Contents(
         .status(ContentStatus.PUBLISHED)
         .createdAt(createdAt)
         .build();
+  }
+
+  public boolean isOwner(long id) {
   }
 }

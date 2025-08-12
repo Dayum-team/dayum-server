@@ -11,4 +11,6 @@ public interface ContentsRepository {
   Contents fetchBy(long id);
 
   Contents save(Contents contents);
+
+  void deleteBy(Contents contents);
 }

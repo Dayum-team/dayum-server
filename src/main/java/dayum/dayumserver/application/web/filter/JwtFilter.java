@@ -14,6 +14,8 @@ import org.springframework.util.AntPathMatcher;
 @RequiredArgsConstructor
 public class JwtFilter implements Filter {
 
+  public static final String MEMBER_ID_ATTRIBUTE = "memberId";
+
   private final JwtProvider jwtProvider;
   private final AntPathMatcher matcher = new AntPathMatcher();
   private static final List<String> TOKEN_AUTHENTICATION_WHITELIST =
@@ -51,7 +53,7 @@ public class JwtFilter implements Filter {
     }
 
     Long memberId = jwtProvider.getMemberId(token);
-    req.setAttribute("memberId", memberId);
+    req.setAttribute(MEMBER_ID_ATTRIBUTE, memberId);
 
     chain.doFilter(request, response);
   }
