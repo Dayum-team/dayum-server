@@ -15,7 +15,9 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(AppException.class)
   public ResponseEntity<ErrorResponse> handleAppException(AppException exception) {
-    log.error(exception.getMessage(), exception);
+    if (!(exception.getExceptionCode() instanceof AuthExceptionCode)) {
+      log.error(exception.getMessage(), exception);
+    }
     return ResponseEntity.status(exception.getExceptionCode().getStatus())
         .body(ErrorResponse.of(exception));
   }
