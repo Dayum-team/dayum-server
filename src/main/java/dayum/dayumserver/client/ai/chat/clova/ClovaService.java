@@ -39,7 +39,7 @@ public class ClovaService {
   private String chatCompletionWithImage(
       String systemMessage, String imageUrl, String userMessage) {
     log.info("Analyzing image with message: {}", userMessage);
-    ClovaRequest request = ClovaRequest.ofWithImage(systemMessage, imageUrl, userMessage);
+    ClovaRequest request = ClovaRequest.ofImage(systemMessage, imageUrl, userMessage);
     return sendRequestAndExtractJson(request);
   }
 

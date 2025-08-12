@@ -55,7 +55,7 @@ public record ClovaRequest(
   }
 
   // 이미지와 텍스트를 함께 보내는 경우
-  public static ClovaRequest ofWithImage(
+  public static ClovaRequest ofImage(
       String systemMessage, String imageUrl, String userMessage) {
     return ClovaRequest.builder()
         .messages(
