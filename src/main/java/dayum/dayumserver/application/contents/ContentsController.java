@@ -1,6 +1,7 @@
 package dayum.dayumserver.application.contents;
 
 import dayum.dayumserver.application.common.JwtAuth;
+import dayum.dayumserver.application.common.JwtAuthWhiteList;
 import dayum.dayumserver.application.common.request.LoginMember;
 import dayum.dayumserver.application.common.response.ApiResponse;
 import dayum.dayumserver.application.common.response.PageResponse;
@@ -27,6 +28,7 @@ public class ContentsController {
   private final ContentsService contentsService;
 
   @GetMapping
+  @JwtAuthWhiteList
   public ApiResponse<PageResponse<ContentsResponse>> retrieveAllContents(
       @RequestParam(value = "member_id", required = false) Long memberId,
       @RequestParam(value = "cursor", defaultValue = "0") long cursorId,

@@ -4,7 +4,7 @@ import dayum.dayumserver.application.common.JwtAuth;
 import dayum.dayumserver.application.common.exception.AppException;
 import dayum.dayumserver.application.common.exception.AuthExceptionCode;
 import dayum.dayumserver.application.common.request.LoginMember;
-import dayum.dayumserver.application.web.filter.JwtFilter;
+import dayum.dayumserver.application.web.interceptor.JwtAuthInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import org.springframework.core.MethodParameter;
@@ -28,7 +28,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
       NativeWebRequest webRequest,
       WebDataBinderFactory binderFactory) {
     return Optional.ofNullable(webRequest.getNativeRequest(HttpServletRequest.class))
-        .map(request -> request.getAttribute(JwtFilter.MEMBER_ID_ATTRIBUTE))
+        .map(request -> request.getAttribute(JwtAuthInterceptor.MEMBER_ID_ATTRIBUTE))
         .map(memberId -> new LoginMember((Long) memberId))
         .orElseThrow(() -> new AppException(AuthExceptionCode.UN_AUTHORIZATION));
   }
