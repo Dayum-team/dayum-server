@@ -124,6 +124,6 @@ public class ContentsService {
       throw new AppException(AuthExceptionCode.ACCESS_DENIED);
     }
     contentsIngredientRepository.deleteAll(contents.ingredients());
-    contentsRepository.deleteBy(contents);
+    contentsRepository.delete(contents);
   }
 }

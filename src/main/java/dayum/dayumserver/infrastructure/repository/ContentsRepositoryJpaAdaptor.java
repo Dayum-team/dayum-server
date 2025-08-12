@@ -47,7 +47,7 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   }
 
   @Override
-  public void deleteBy(Contents contents) {
+  public void delete(Contents contents) {
     contentsJpaRepository.delete(contentsMapper.mapToJpaEntity(contents));
   }
 }

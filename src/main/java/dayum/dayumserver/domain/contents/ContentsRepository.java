@@ -12,5 +12,5 @@ public interface ContentsRepository {
 
   Contents save(Contents contents);
 
-  void deleteBy(Contents contents);
+  void delete(Contents contents);
 }

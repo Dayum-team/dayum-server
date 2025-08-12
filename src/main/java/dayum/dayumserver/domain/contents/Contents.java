@@ -16,7 +16,12 @@ public record Contents(
     LocalDateTime createdAt) {
 
   public static Contents createDraft(Member member, String url, String thumbnailUrl) {
-    return Contents.builder().member(member).url(url).thumbnailUrl(thumbnailUrl).status(ContentStatus.PENDING).build();
+    return Contents.builder()
+        .member(member)
+        .url(url)
+        .thumbnailUrl(thumbnailUrl)
+        .status(ContentStatus.PENDING)
+        .build();
   }
 
   public double calculateCalories() {
@@ -50,5 +55,6 @@ public record Contents(
   }
 
   public boolean isOwner(long id) {
+    return member.id() == id;
   }
 }
