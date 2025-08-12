@@ -4,6 +4,7 @@ import dayum.dayumserver.domain.contents.Contents;
 
 public record ContentsResponse(
     long id,
+    long memberId,
     String thumbnailUrl,
     String url,
     double calories,
@@ -14,6 +15,7 @@ public record ContentsResponse(
   public static ContentsResponse from(Contents contents) {
     return new ContentsResponse(
         contents.id(),
+        contents.member().id(),
         contents.thumbnailUrl(),
         contents.url(),
         contents.calculateCalories(),
