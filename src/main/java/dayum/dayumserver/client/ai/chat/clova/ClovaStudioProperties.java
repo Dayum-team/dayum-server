@@ -14,7 +14,6 @@ public class ClovaStudioProperties {
   private String baseUrl;
   private String apiKey;
 
-  // 모델 파라미터 상수
   public static class ModelConfig {
     public static final double TOP_P = 0.8;
     public static final int TOP_K = 0;
@@ -25,7 +24,6 @@ public class ClovaStudioProperties {
     public static final boolean INCLUDE_AI_FILTERS = false;
   }
 
-  // 프롬프트 상수
   public static class PromptConfig {
     public static final String INGREDIENT_EXTRACTION =
         """
@@ -39,7 +37,7 @@ public class ClovaStudioProperties {
             응답 형식:
             재료를 추출하여 JSON 형식으로 반환하세요.
             무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
-            형식: {\\"ingredients\\": [{\\"name\\": \\"재료명\\", \\"quantity\\": \\"양\\"}, ...]}
+            형식: {"ingredients": [{"name": "재료명", "quantity": "양"}, ...]}
 
             예시:
             {
@@ -49,5 +47,29 @@ public class ClovaStudioProperties {
               ]
             }
         """;
+
+    public static final String FOOD_IMAGE_ANALYSIS =
+        """
+            당신은 음식 사진을 분석하여 음식의 종류와 양을 추정하는 AI입니다.
+            제공된 이미지를 분석하여 다음 정보를 JSON 형식으로 추출해주세요:
+            1. 음식의 이름
+            2. 추정되는 양 (g 단위)
+
+            음식의 양은 배경과 그릇 크기에 유의하여 추정해주세요.
+
+            응답 형식:
+            무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
+            형식: {"food": {"name": "음식명", "quantity": "추정량"}}
+
+            예시:
+            {
+              "food": {
+                "name": "김치볶음밥",
+                "quantity": "300g"
+              }
+            }
+        """;
+
+    public static final String FOOD_IMAGE_USER_PROMPT = "이 사진의 음식을 분석해주세요. 음식의 종류와 양을 추정해주세요.";
   }
 }
