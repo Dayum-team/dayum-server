@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -48,16 +49,16 @@ public class MemberService {
 
     return switch (provider) {
       case NAVER -> {
-        if (isBlank(accessTokenOrIdToken)) {
+        if (!StringUtils.hasText(accessTokenOrIdToken)) {
           throw new IllegalArgumentException("NAVER requires accessToken");
         }
         yield naverOAuthClient.getUserInfo(accessTokenOrIdToken);
       }
       case APPLE -> {
-        if (!isBlank(accessTokenOrIdToken)) {
+        if (StringUtils.hasText(accessTokenOrIdToken)) {
           yield appleAuthService.parseIdTokenToUser(accessTokenOrIdToken);
         }
-        if (!isBlank(authorizationCode)) {
+        if (StringUtils.hasText(authorizationCode)) {
           AppleTokenResponse tokens = appleAuthService.exchangeCodeForTokens(authorizationCode);
           yield appleAuthService.parseIdTokenToUser(tokens.idToken());
         }
@@ -65,10 +66,6 @@ public class MemberService {
             "APPLE requires id_token (in accessToken) or authorizationCode");
       }
     };
-  }
-
-  private boolean isBlank(String s) {
-    return s == null || s.isBlank();
   }
 
   public Optional<LoginResponse> login(LoginRequest request, Oauth2Provider provider) {
