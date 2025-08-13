@@ -20,7 +20,8 @@ public class ClovaService {
 
   public String extractIngredients(String subtitleText, String speechText) {
     String userPrompt = buildUserPrompt(subtitleText, speechText);
-    return chatCompletion(ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION, userPrompt);
+    return chatCompletion(
+        ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION_FROM_TEXT, userPrompt);
   }
 
   public String analyzeFoodImage(String imageUrl) {
@@ -28,6 +29,13 @@ public class ClovaService {
         ClovaStudioProperties.PromptConfig.FOOD_IMAGE_ANALYSIS,
         imageUrl,
         ClovaStudioProperties.PromptConfig.FOOD_IMAGE_USER_PROMPT);
+  }
+
+  public String extractIngredientsFromImage(String imageurl) {
+    return chatCompletionWithImage(
+        ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION_FROM_IMAGE,
+        imageurl,
+        ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION_FROM_IMAGE_USER_PROMPT);
   }
 
   private String chatCompletion(String systemMessage, String userMessage) {
