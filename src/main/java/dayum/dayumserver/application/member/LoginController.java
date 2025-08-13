@@ -3,7 +3,6 @@ package dayum.dayumserver.application.member;
 import dayum.dayumserver.application.member.dto.LoginRequest;
 import dayum.dayumserver.application.member.dto.LoginResponse;
 import dayum.dayumserver.application.member.dto.RegisterRequest;
-import dayum.dayumserver.client.s3.oauth2.naver.NaverOAuthClient;
 import dayum.dayumserver.domain.member.Oauth2Provider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
   private final MemberService memberService;
-  private final NaverOAuthClient naverOAuthClient;
   private final JwtProvider jwtProvider;
 
   @PostMapping("/signup/{provider}")
@@ -35,5 +33,12 @@ public class LoginController {
         .login(request.accessToken(), oauth2Provider)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.status(401).build()); // 미가입 or 탈퇴 -> 401
+  }
+
+  @GetMapping("/test-token")
+  public ResponseEntity<LoginResponse> testToken(@RequestParam Long memberId) {
+    return ResponseEntity.ok(
+        new LoginResponse(
+            jwtProvider.createToken(memberId), jwtProvider.createRefreshToken(memberId)));
   }
 }

@@ -45,4 +45,9 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
     return contentsMapper.mapToDomainEntity(
         contentsJpaRepository.save(contentsMapper.mapToJpaEntity(contents)));
   }
+
+  @Override
+  public void delete(Contents contents) {
+    contentsJpaRepository.delete(contentsMapper.mapToJpaEntity(contents));
+  }
 }
