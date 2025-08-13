@@ -1,10 +1,9 @@
 package dayum.dayumserver.domain.contents;
 
 import dayum.dayumserver.domain.member.Member;
-import lombok.Builder;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
 
 @Builder
 public record Contents(
@@ -17,7 +16,12 @@ public record Contents(
     LocalDateTime createdAt) {
 
   public static Contents createDraft(Member member, String url, String thumbnailUrl) {
-    return Contents.builder().member(member).url(url).thumbnailUrl(thumbnailUrl).status(ContentStatus.PENDING).build();
+    return Contents.builder()
+        .member(member)
+        .url(url)
+        .thumbnailUrl(thumbnailUrl)
+        .status(ContentStatus.PENDING)
+        .build();
   }
 
   public double calculateCalories() {
@@ -48,5 +52,9 @@ public record Contents(
         .status(ContentStatus.PUBLISHED)
         .createdAt(createdAt)
         .build();
+  }
+
+  public boolean isOwner(long id) {
+    return member.id() == id;
   }
 }

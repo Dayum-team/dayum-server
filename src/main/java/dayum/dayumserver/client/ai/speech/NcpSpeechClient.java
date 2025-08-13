@@ -2,11 +2,13 @@ package dayum.dayumserver.client.ai.speech;
 
 import dayum.dayumserver.client.ai.speech.dto.NcpSpeechRecognizeResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NcpSpeechClient {
