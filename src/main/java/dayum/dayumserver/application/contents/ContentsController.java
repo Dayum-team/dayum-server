@@ -6,12 +6,10 @@ import dayum.dayumserver.application.common.request.LoginMember;
 import dayum.dayumserver.application.common.response.ApiResponse;
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.request.ContentsAnalyzeRequest;
-import dayum.dayumserver.application.contents.dto.request.ContentsRecommendRequest;
 import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
 import dayum.dayumserver.application.contents.dto.response.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.response.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.response.ContentsResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,13 +40,6 @@ public class ContentsController {
   @GetMapping("/{id}")
   public ApiResponse<ContentsDetailResponse> retrieveContents(@PathVariable long id) {
     var contents = contentsService.retrieve(id);
-    return ApiResponse.of(contents);
-  }
-
-  @PostMapping("/recommended")
-  public ApiResponse<List<ContentsDetailResponse>> recommendContents(
-      @RequestBody ContentsRecommendRequest request) {
-    var contents = contentsService.recommend(request);
     return ApiResponse.of(contents);
   }
 
