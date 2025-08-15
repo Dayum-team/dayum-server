@@ -49,12 +49,13 @@ jobs:
           AWS_SECRET_TOKEN: ${{ secrets.AWS_SECRET_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_ACCESS_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           port: ${{ secrets.SERVER_SSH_PORT }}
           username: ${{ secrets.SERVER_SSH_USERNAME }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
-          envs: AWS_ACCESS_TOKEN,AWS_SECRET_TOKEN,DOCKER_USERNAME,DOCKER_ACCESS_TOKEN
+          envs: AWS_ACCESS_TOKEN,AWS_SECRET_TOKEN,DOCKER_USERNAME,DOCKER_ACCESS_TOKEN,SENTRY_AUTH_TOKEN
           script_stop: true
           script: |
             set -euo pipefail

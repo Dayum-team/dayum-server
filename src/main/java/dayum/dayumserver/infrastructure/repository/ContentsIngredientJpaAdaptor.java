@@ -1,19 +1,14 @@
 package dayum.dayumserver.infrastructure.repository;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
 import dayum.dayumserver.domain.contents.ContentsIngredient;
 import dayum.dayumserver.domain.contents.ContentsIngredientRepository;
-import dayum.dayumserver.domain.ingredient.Ingredient;
 import dayum.dayumserver.infrastructure.repository.jpa.entity.ContentsIngredientJpaEntity;
 import dayum.dayumserver.infrastructure.repository.jpa.repository.ContentsIngredientJpaRepository;
-
 import dayum.dayumserver.infrastructure.repository.mapper.ContentsIngredientMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,5 +28,12 @@ public class ContentsIngredientJpaAdaptor implements ContentsIngredientRepositor
         ingredientJpaRepository.saveAll(jpaEntities);
 
     return savedJpaEntities.stream().map(contentsIngredientMapper::mapToDomainEntity).toList();
+  }
+
+  @Override
+  public void deleteAll(List<ContentsIngredient> ingredients) {
+    List<ContentsIngredientJpaEntity> jpaEntities =
+        ingredients.stream().map(contentsIngredientMapper::mapToJpaEntity).toList();
+    ingredientJpaRepository.deleteAll(jpaEntities);
   }
 }

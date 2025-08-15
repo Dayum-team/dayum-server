@@ -1,34 +1,23 @@
 package dayum.dayumserver.client.ai.ocr;
 
-import jakarta.annotation.PreDestroy;
+import java.io.File;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class OcrService {
 
-  private static final int MAX_CONCURRENT_REQUESTS = 5;
-
-  private final RestClient restClient;
-
-  private final ExecutorService ocrThreadPool =
-      Executors.newFixedThreadPool(MAX_CONCURRENT_REQUESTS);
+  private final WebClient webClient;
 
   @Value("${ncp.ocr.secret-key}")
   private String ocrSecretKey;
@@ -36,45 +25,23 @@ public class OcrService {
   @Value("${ncp.ocr.api-url}")
   private String ocrApiUrl;
 
-  @PreDestroy
-  public void shutdown() {
-    ocrThreadPool.shutdown();
-  }
-
   /** 파일들에서 추출한 텍스트를 합쳐서 반환 */
-  public String extractTextFromFiles(List<File> files) {
-    if (files == null || files.isEmpty()) {
-      return "";
+  public Mono<String> extractTextFromFiles(File file) {
+    if (file == null) {
+      return Mono.just("");
     }
-
-    List<CompletableFuture<String>> futures =
-        files.stream()
-            .map(
-                file ->
-                    CompletableFuture.supplyAsync(() -> extractTextFromFile(file), ocrThreadPool))
-            .collect(Collectors.toList());
-
-    return futures.stream()
-        .map(CompletableFuture::join)
-        .filter(text -> !text.isEmpty())
-        .collect(Collectors.joining(" "))
-        .trim();
+    return callOcrApi(file).map(this::parseTextFromResponse);
   }
 
-  private String extractTextFromFile(File file) {
+  private Mono<OcrResponse> callOcrApi(File file) {
+    byte[] fileBytes;
     try {
-      OcrResponse response = callOcrApi(file);
-      return parseTextFromResponse(response);
+      fileBytes = Files.readAllBytes(file.toPath());
     } catch (Exception e) {
-      log.info("OCR API call failed: {}", e.getMessage());
-      return "";
+      return Mono.error(e);
     }
-  }
 
-  private OcrResponse callOcrApi(File file) throws IOException {
-    byte[] fileBytes = Files.readAllBytes(file.toPath());
     String base64Data = Base64.getEncoder().encodeToString(fileBytes);
-
     Map<String, Object> requestBody =
         Map.of(
             "version", "V2",
@@ -83,14 +50,14 @@ public class OcrService {
             "lang", "ko",
             "images", List.of(Map.of("format", "png", "name", file.getName(), "data", base64Data)));
 
-    return restClient
+    return webClient
         .post()
         .uri(ocrApiUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .header("X-OCR-SECRET", ocrSecretKey)
-        .body(requestBody)
+        .bodyValue(requestBody)
         .retrieve()
-        .body(OcrResponse.class);
+        .bodyToMono(OcrResponse.class);
   }
 
   private String parseTextFromResponse(OcrResponse response) {

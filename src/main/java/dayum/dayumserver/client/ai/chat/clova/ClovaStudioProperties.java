@@ -14,7 +14,6 @@ public class ClovaStudioProperties {
   private String baseUrl;
   private String apiKey;
 
-  // 모델 파라미터 상수
   public static class ModelConfig {
     public static final double TOP_P = 0.8;
     public static final int TOP_K = 0;
@@ -25,21 +24,21 @@ public class ClovaStudioProperties {
     public static final boolean INCLUDE_AI_FILTERS = false;
   }
 
-  // 프롬프트 상수
   public static class PromptConfig {
-    public static final String INGREDIENT_EXTRACTION =
+    public static final String INGREDIENT_EXTRACTION_FROM_TEXT =
         """
             당신은 다이어트 요리 영상의 자막과 음성에서 식재료를 추출하는 AI입니다.
             주어진 텍스트에서 식재료와 사용량을 JSON 형식으로 추출해주세요.
             레시피와 재료도구는 추출하지 않아도 됩니다.
             사용량은 g 단위를 사용하세요.
             응답 형식에 유의하세요.
-
+            응답에 주석을 포함하지 마세요. 절대로.
+            상품명에는 한글만 포함하고, 영어 및 숫자는 모두 제거하세요.
 
             응답 형식:
             재료를 추출하여 JSON 형식으로 반환하세요.
             무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
-            형식: {\\"ingredients\\": [{\\"name\\": \\"재료명\\", \\"quantity\\": \\"양\\"}, ...]}
+            형식: {"ingredients": [{"name": "재료명", "quantity": "양"}, ...]}
 
             예시:
             {
@@ -49,5 +48,40 @@ public class ClovaStudioProperties {
               ]
             }
         """;
+
+    public static final String FOOD_IMAGE_ANALYSIS =
+        """
+            당신은 음식 사진을 분석하여 음식의 종류와 양을 추정하는 AI입니다.
+            제공된 이미지를 분석하여 다음 정보를 JSON 형식으로 추출해주세요:
+            1. 음식의 이름
+            2. 추정되는 양 (g 단위)
+
+            음식의 양은 배경과 그릇 크기에 유의하여 추정해주세요.
+
+            응답 형식:
+            무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
+            형식: {"food": {"name": "음식명", "quantity": "추정량"}}
+
+            예시:
+            {
+              "food": {
+                "name": "김치볶음밥",
+                "quantity": "300g"
+              }
+            }
+        """;
+    public static final String FOOD_IMAGE_USER_PROMPT = "이 사진의 음식을 분석해주세요. 음식의 종류와 양을 추정해주세요.";
+
+    public static final String INGREDIENT_EXTRACTION_FROM_IMAGE =
+        """
+		당신은 음식 사진을 분석하여 식재료의 종류를 추정하는 AI입니다.
+		제공된 이미지를 분석하여 식재료 종류를 JSON 형식으로 추출해주세요.
+  
+			  응답 형식:
+			  무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
+			  형식: {"name" : "양배추", "name" : "참치"}
+		""";
+    public static final String INGREDIENT_EXTRACTION_FROM_IMAGE_USER_PROMPT = "이 사진의 음식을 분석해주세요. 음식의 종류와 양을 추정해주세요.";
+
   }
 }

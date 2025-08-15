@@ -20,13 +20,39 @@ public class ClovaService {
 
   public String extractIngredients(String subtitleText, String speechText) {
     String userPrompt = buildUserPrompt(subtitleText, speechText);
-    return chatCompletion(ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION, userPrompt);
+    return chatCompletion(
+        ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION_FROM_TEXT, userPrompt);
   }
 
-  public String chatCompletion(String systemMessage, String userMessage) {
+  public String analyzeFoodImage(String imageUrl) {
+    return chatCompletionWithImage(
+        ClovaStudioProperties.PromptConfig.FOOD_IMAGE_ANALYSIS,
+        imageUrl,
+        ClovaStudioProperties.PromptConfig.FOOD_IMAGE_USER_PROMPT);
+  }
+
+  public String extractIngredientsFromImage(String imageurl) {
+    return chatCompletionWithImage(
+        ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION_FROM_IMAGE,
+        imageurl,
+        ClovaStudioProperties.PromptConfig.INGREDIENT_EXTRACTION_FROM_IMAGE_USER_PROMPT);
+  }
+
+  private String chatCompletion(String systemMessage, String userMessage) {
     log.info("User Message: {}", userMessage);
     ClovaRequest request = ClovaRequest.of(systemMessage, userMessage);
+    return sendRequestAndExtractJson(request);
+  }
 
+  private String chatCompletionWithImage(
+      String systemMessage, String imageUrl, String userMessage) {
+    log.info("Analyzing image with message: {}", userMessage);
+    ClovaRequest request = ClovaRequest.ofImage(systemMessage, imageUrl, userMessage);
+    return sendRequestAndExtractJson(request);
+  }
+
+  // 공통 요청 처리 로직
+  private String sendRequestAndExtractJson(ClovaRequest request) {
     ClovaResponse response =
         restClient
             .post()

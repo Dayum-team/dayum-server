@@ -6,8 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,17 +13,18 @@ import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FrameExtractorService {
 
-  private static final int FRAME_EXTRACTION_INTERVAL_SECONDS = 3;
-  private static final String FRAME_FILE_PREFIX = "frame-";
-  private static final String FRAME_FILE_EXTENSION = "png";
+  private final Java2DFrameConverter converter;
 
-  private final Java2DFrameConverter converter = new Java2DFrameConverter();
+  public static final String FRAME_FILE_PREFIX = "frame-";
+  public static final String FRAME_FILE_EXTENSION = "png";
+
 
   public File extractThumbnail(File videoFile, Path workingDir) {
     try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoFile)) {
@@ -56,41 +55,17 @@ public class FrameExtractorService {
     }
   }
 
-  public List<File> extractFrames(File videoFile, Path workingDir) {
-    List<File> frameFiles = new ArrayList<>();
-
-    try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoFile)) {
-      grabber.start();
-
-      double frameRate = grabber.getFrameRate();
-      Frame frame;
-      int frameCount = 0;
-
-      int frameInterval = (int) Math.round(frameRate * FRAME_EXTRACTION_INTERVAL_SECONDS);
-
-      while ((frame = grabber.grabImage()) != null) {
-        if (frameCount % frameInterval == 0) {
-          BufferedImage bufferedImage = converter.convert(frame);
-          if (bufferedImage != null) {
-            int frameIndex = frameCount / frameInterval;
-            String fileName = STR."\{FRAME_FILE_PREFIX}\{frameIndex}.\{FRAME_FILE_EXTENSION}";
-            File outputFile = workingDir.resolve(fileName).toFile();
-            ImageIO.write(bufferedImage, FRAME_FILE_EXTENSION, outputFile);
-            frameFiles.add(outputFile);
-          }
-        }
-        frameCount++;
+  public Flux<File> extractFrames(File videoFile, Path workingDir) {
+    return Flux.generate(() -> new FrameExtractor(videoFile, workingDir, converter), (extractor, sink) -> {
+      try {
+        File nextFrame = extractor.next();
+        if (nextFrame != null) sink.next(nextFrame);
+        else sink.complete();
+      } catch (Exception e) {
+        sink.error(new AppException(CommonExceptionCode.FRAME_EXTRACTION_FAILED));
       }
-      return frameFiles;
-
-    } catch (IOException e) {
-      cleanupFiles(frameFiles);
-      throw new AppException(CommonExceptionCode.FRAME_EXTRACTION_FAILED);
-    }
-  }
-
-  private void cleanupFiles(List<File> files) {
-    files.stream().filter(file -> file != null && file.exists()).forEach(File::delete);
+      return extractor;
+    }, FrameExtractor::close);
   }
 
   private static BufferedImage centerCrop(BufferedImage image) {

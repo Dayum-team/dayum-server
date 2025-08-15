@@ -104,6 +104,7 @@ public class MemberService {
         member.nickname(),
         member.bio(),
         member.profileImage());
+        jwtProvider.createToken(member.id()), jwtProvider.createRefreshToken(member.id()));
   }
 
   @Transactional

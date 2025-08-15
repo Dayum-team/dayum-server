@@ -1,5 +1,8 @@
 package dayum.dayumserver.application.contents;
 
+import dayum.dayumserver.application.common.exception.AppException;
+import dayum.dayumserver.application.common.exception.AuthExceptionCode;
+import dayum.dayumserver.application.common.request.LoginMember;
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
@@ -115,4 +118,12 @@ public class ContentsService {
     return contentsRepository.save(contents.publish()).url();
   }
 
+  public void delete(long contentsId, LoginMember member) {
+    var contents = contentsRepository.fetchBy(contentsId);
+    if (contents.isOwner(member.id())) {
+      throw new AppException(AuthExceptionCode.ACCESS_DENIED);
+    }
+    contentsIngredientRepository.deleteAll(contents.ingredients());
+    contentsRepository.delete(contents);
+  }
 }
