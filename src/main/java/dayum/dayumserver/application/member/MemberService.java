@@ -1,8 +1,7 @@
 package dayum.dayumserver.application.member;
 
-import static dayum.dayumserver.domain.member.Oauth2Provider.APPLE;
-import static dayum.dayumserver.domain.member.Oauth2Provider.NAVER;
-
+import dayum.dayumserver.application.member.dto.AppleTokenResponse;
+import dayum.dayumserver.application.member.dto.LoginRequest;
 import dayum.dayumserver.application.member.dto.LoginResponse;
 import dayum.dayumserver.application.member.dto.OAuthUserInfo;
 import dayum.dayumserver.application.member.dto.RegisterRequest;
@@ -14,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class MemberService {
 
   private final MemberRepository memberRepository;
   private final NaverOAuthClient naverOAuthClient;
+  private final AppleAuthService appleAuthService;
   private final JwtProvider jwtProvider;
 
   public Member loginOrRegister(
@@ -35,28 +36,42 @@ public class MemberService {
         .orElseGet(
             () ->
                 memberRepository.save(
-                    Member.builder()
-                        .email(user.email())
-                        .name(user.name())
-                        .nickname(nickname)
-                        .profileImage(profileImage)
-                        .oauth2Provider(provider)
-                        .bio(bio)
-                        .deleted(false)
-                        .build()));
+                    Member.createOAuthMember(
+                        user.email(), user.name(), nickname, profileImage, bio, provider)));
   }
 
   public boolean isNicknameDuplicated(String nickname) {
     return memberRepository.existsByNickname(nickname);
   }
 
-  public Optional<LoginResponse> login(String oauthAccessToken, Oauth2Provider provider) {
+  private OAuthUserInfo resolveOAuthUser(
+      Oauth2Provider provider, String accessTokenOrIdToken, String authorizationCode) {
 
+    return switch (provider) {
+      case NAVER -> {
+        if (!StringUtils.hasText(accessTokenOrIdToken)) {
+          throw new IllegalArgumentException("NAVER requires accessToken");
+        }
+        yield naverOAuthClient.getUserInfo(accessTokenOrIdToken);
+      }
+      case APPLE -> {
+        if (StringUtils.hasText(accessTokenOrIdToken)) {
+          yield appleAuthService.parseIdTokenToUser(accessTokenOrIdToken);
+        }
+        if (StringUtils.hasText(authorizationCode)) {
+          AppleTokenResponse tokens = appleAuthService.exchangeCodeForTokens(authorizationCode);
+          yield appleAuthService.parseIdTokenToUser(tokens.idToken());
+        }
+        throw new IllegalArgumentException(
+            "APPLE requires id_token (in accessToken) or authorizationCode");
+      }
+    };
+  }
+
+  public Optional<LoginResponse> login(LoginRequest request, Oauth2Provider provider) {
     OAuthUserInfo userInfo =
-        switch (provider) {
-          case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
-          case APPLE -> throw new UnsupportedOperationException("Apple not implemented yet");
-        };
+        resolveOAuthUser(provider, request.accessToken(), request.authorizationCode());
+
     return memberRepository
         .findByEmailAndProvider(userInfo.email(), provider)
         .filter(m -> !m.deleted())
@@ -67,26 +82,20 @@ public class MemberService {
   }
 
   public LoginResponse signup(RegisterRequest request, Oauth2Provider provider) {
-    String oauthAccessToken = request.accessToken(); // OAuth2 provider token
-
     OAuthUserInfo userInfo =
-        switch (provider) {
-          case NAVER -> naverOAuthClient.getUserInfo(oauthAccessToken);
-          case APPLE -> throw new UnsupportedOperationException("Apple not implemented yet");
-        };
+        resolveOAuthUser(provider, request.accessToken(), request.authorizationCode());
 
-    String nickname = Optional.ofNullable(request.nickname()).orElse(userInfo.name());
+    String nickname =
+        Optional.ofNullable(request.nickname())
+            .orElseThrow(() -> new IllegalArgumentException("닉네임은 필수 입력 값입니다."));
     String profileImage =
         Optional.ofNullable(request.profileImage()).orElse(userInfo.profileImage());
     String bio = Optional.ofNullable(request.bio()).orElse("");
 
     Member member = loginOrRegister(userInfo, nickname, profileImage, bio, provider);
 
-    // 앱에서 사용할 토큰
-    String appAccessToken = jwtProvider.createToken(member.id());
-    String appRefreshToken = jwtProvider.createRefreshToken(member.id());
-
-    return new LoginResponse(appAccessToken, appRefreshToken);
+    return new LoginResponse(
+        jwtProvider.createToken(member.id()), jwtProvider.createRefreshToken(member.id()));
   }
 
   @Transactional

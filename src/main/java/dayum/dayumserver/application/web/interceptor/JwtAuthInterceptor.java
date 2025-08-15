@@ -21,7 +21,8 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
   private final JwtProvider jwtProvider;
   private final AntPathMatcher matcher = new AntPathMatcher();
-  private static final List<String> TOKEN_AUTHENTICATION_WHITELIST = List.of("/health", "/auth/**");
+  private static final List<String> TOKEN_AUTHENTICATION_WHITELIST =
+      List.of("/health", "/api/auth/**", "/api/**");
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
