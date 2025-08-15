@@ -25,7 +25,7 @@ public class ClovaStudioProperties {
   }
 
   public static class PromptConfig {
-    public static final String INGREDIENT_EXTRACTION =
+    public static final String INGREDIENT_EXTRACTION_FROM_TEXT =
         """
             당신은 다이어트 요리 영상의 자막과 음성에서 식재료를 추출하는 AI입니다.
             주어진 텍스트에서 식재료와 사용량을 JSON 형식으로 추출해주세요.
@@ -70,7 +70,18 @@ public class ClovaStudioProperties {
               }
             }
         """;
-
     public static final String FOOD_IMAGE_USER_PROMPT = "이 사진의 음식을 분석해주세요. 음식의 종류와 양을 추정해주세요.";
+
+    public static final String INGREDIENT_EXTRACTION_FROM_IMAGE =
+        """
+		당신은 음식 사진을 분석하여 식재료의 종류를 추정하는 AI입니다.
+		제공된 이미지를 분석하여 식재료 종류를 JSON 형식으로 추출해주세요.
+  
+			  응답 형식:
+			  무조건 마크다운과 코드 블록 없이 순수 JSON만 응답하세요.
+			  형식: {"name" : "양배추", "name" : "참치"}
+		""";
+    public static final String INGREDIENT_EXTRACTION_FROM_IMAGE_USER_PROMPT = "이 사진의 음식을 분석해주세요. 음식의 종류와 양을 추정해주세요.";
+
   }
 }
