@@ -3,25 +3,16 @@ package dayum.dayumserver.application.contents;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dayum.dayumserver.application.common.exception.AppException;
-import dayum.dayumserver.application.common.exception.CommonExceptionCode;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
 import dayum.dayumserver.client.ai.chat.clova.ClovaService;
 import dayum.dayumserver.client.ai.ocr.OcrService;
 import dayum.dayumserver.client.ai.speech.NcpSpeechClient;
 import dayum.dayumserver.client.cv.FrameExtractorService;
-import dayum.dayumserver.client.s3.S3ClientService;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.StructuredTaskScope;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +22,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ContentAnalysisService {
 
-  private final S3ClientService s3ClientService;
   private final FrameExtractorService frameExtractorService;
   private final OcrService ocrService;
   private final NcpSpeechClient ncpSpeechClient;

@@ -44,4 +44,25 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
           + "LEFT JOIN FETCH ci.ingredient "
           + "WHERE contents.id = :id")
   Optional<ContentsJpaEntity> findById(@Param("id") long id);
+
+  @Query(
+      "SELECT contents.id "
+          + "FROM ContentsJpaEntity contents "
+          + "WHERE NOT EXISTS ("
+          + " SELECT 1 "
+          + " FROM ContentsIngredientJpaEntity contentIngredient "
+          + " WHERE contentIngredient.contents = contents "
+          + " AND contentIngredient.ingredient.id NOT IN :ingredientIds"
+          + ") "
+          + "AND contents.status = 'PUBLISHED' ")
+  List<Long> findAllMakeableIds(List<Long> ingredientIds, Pageable page);
+
+  @Query(
+      "SELECT contents "
+          + "FROM ContentsJpaEntity contents "
+          + "LEFT JOIN FETCH contents.member "
+          + "LEFT JOIN FETCH contents.ingredients ci "
+          + "LEFT JOIN FETCH ci.ingredient "
+          + "WHERE contents.id IN :ids")
+  List<ContentsJpaEntity> findAllByIdIn(List<Long> ids);
 }

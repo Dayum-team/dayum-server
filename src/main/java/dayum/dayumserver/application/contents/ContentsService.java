@@ -5,6 +5,7 @@ import dayum.dayumserver.application.common.exception.AuthExceptionCode;
 import dayum.dayumserver.application.common.request.LoginMember;
 import dayum.dayumserver.application.common.response.PageResponse;
 import dayum.dayumserver.application.contents.dto.internal.ExtractedIngredientData;
+import dayum.dayumserver.application.contents.dto.request.ContentsRecommendRequest;
 import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
 import dayum.dayumserver.application.contents.dto.response.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.response.ContentsDetailResponse;
@@ -59,6 +60,19 @@ public class ContentsService {
   public ContentsDetailResponse retrieve(long id) {
     var contents = contentsRepository.fetchBy(id);
     return ContentsDetailResponse.from(contents);
+  }
+
+  public List<ContentsDetailResponse> recommend(ContentsRecommendRequest request) {
+    // TODO(chanjun.park):  For the MVP, recommendations are based only on the presence of
+    //  ingredients. We need to improve it to take ingredient quantities into account.
+    var ingredientNames =
+        request.ingredients().stream()
+            .map(ContentsRecommendRequest.IngredientRequest::name)
+            .toList();
+    var ingredients = ingredientService.findIngredientsByNames(ingredientNames);
+    return contentsRepository.fetchMakeableContents(ingredients, request.maxCount()).stream()
+        .map(ContentsDetailResponse::from)
+        .toList();
   }
 
   public ContentsAnalyzeResponse analyze(String contentsUrl, Long memberId) {
