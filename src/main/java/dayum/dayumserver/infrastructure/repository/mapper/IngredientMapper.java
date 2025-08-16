@@ -8,4 +8,6 @@ import org.mapstruct.Mapper;
 public interface IngredientMapper {
 
   Ingredient mapToDomainEntity(IngredientJpaEntity ingredientJpaEntity);
+
+  IngredientJpaEntity mapToJpaEntity(Ingredient ingredient);
 }

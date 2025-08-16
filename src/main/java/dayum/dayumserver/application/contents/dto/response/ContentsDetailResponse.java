@@ -2,6 +2,7 @@ package dayum.dayumserver.application.contents.dto.response;
 
 import dayum.dayumserver.domain.contents.Contents;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ContentsDetailResponse(
     long id,
@@ -9,6 +10,7 @@ public record ContentsDetailResponse(
     String memberNickname,
     String thumbnailUrl,
     String url,
+    List<ContentsIngredientResponse> ingredients,
     double calories,
     double carbohydrates,
     double proteins,
@@ -22,6 +24,7 @@ public record ContentsDetailResponse(
         contents.member().nickname(),
         contents.thumbnailUrl(),
         contents.url(),
+        contents.ingredients().stream().map(ContentsIngredientResponse::from).toList(),
         contents.calculateCalories(),
         contents.calculateCarbohydrates(),
         contents.calculateProteins(),

@@ -1,5 +1,6 @@
 package dayum.dayumserver.domain.contents;
 
+import dayum.dayumserver.domain.ingredient.Ingredient;
 import java.util.List;
 
 public interface ContentsRepository {
@@ -13,4 +14,6 @@ public interface ContentsRepository {
   Contents save(Contents contents);
 
   void delete(Contents contents);
+
+  List<Contents> fetchMakeableContents(List<Ingredient> ingredients, int size);
 }

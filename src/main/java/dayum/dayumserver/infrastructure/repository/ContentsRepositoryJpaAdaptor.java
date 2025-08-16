@@ -2,8 +2,10 @@ package dayum.dayumserver.infrastructure.repository;
 
 import dayum.dayumserver.domain.contents.Contents;
 import dayum.dayumserver.domain.contents.ContentsRepository;
+import dayum.dayumserver.domain.ingredient.Ingredient;
 import dayum.dayumserver.infrastructure.repository.jpa.repository.ContentsJpaRepository;
 import dayum.dayumserver.infrastructure.repository.mapper.ContentsMapper;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -49,5 +51,18 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   @Override
   public void delete(Contents contents) {
     contentsJpaRepository.delete(contentsMapper.mapToJpaEntity(contents));
+  }
+
+  @Override
+  public List<Contents> fetchMakeableContents(List<Ingredient> ingredients, int size) {
+    if (ingredients == null || ingredients.isEmpty()) {
+      return Collections.emptyList();
+    }
+    var ingredientIds = ingredients.stream().map(Ingredient::id).toList();
+    var contentsIds =
+        contentsJpaRepository.findAllMakeableIds(ingredientIds, PageRequest.of(0, size));
+    return contentsJpaRepository.findAllByIdIn(contentsIds).stream()
+        .map(contentsMapper::mapToDomainEntity)
+        .toList();
   }
 }
