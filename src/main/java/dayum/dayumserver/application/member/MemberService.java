@@ -78,7 +78,11 @@ public class MemberService {
         .map(
             m ->
                 new LoginResponse(
-                    jwtProvider.createToken(m.id()), jwtProvider.createRefreshToken(m.id())));
+                    jwtProvider.createToken(m.id()),
+                    jwtProvider.createRefreshToken(m.id()),
+                    m.nickname(),
+                    m.bio(),
+                    m.profileImage()));
   }
 
   public LoginResponse signup(RegisterRequest request, Oauth2Provider provider) {
@@ -95,6 +99,11 @@ public class MemberService {
     Member member = loginOrRegister(userInfo, nickname, profileImage, bio, provider);
 
     return new LoginResponse(
+        jwtProvider.createToken(member.id()),
+        jwtProvider.createRefreshToken(member.id()),
+        member.nickname(),
+        member.bio(),
+        member.profileImage());
         jwtProvider.createToken(member.id()), jwtProvider.createRefreshToken(member.id()));
   }
 
