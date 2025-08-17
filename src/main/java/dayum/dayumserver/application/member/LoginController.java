@@ -3,6 +3,7 @@ package dayum.dayumserver.application.member;
 import dayum.dayumserver.application.member.dto.LoginRequest;
 import dayum.dayumserver.application.member.dto.LoginResponse;
 import dayum.dayumserver.application.member.dto.RegisterRequest;
+import dayum.dayumserver.application.member.dto.TokenResponse;
 import dayum.dayumserver.domain.member.Oauth2Provider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +37,9 @@ public class LoginController {
   }
 
   @GetMapping("/test-token")
-  public ResponseEntity<LoginResponse> testToken(@RequestParam Long memberId) {
+  public ResponseEntity<TokenResponse> testToken(@RequestParam Long memberId) {
     return ResponseEntity.ok(
-        new LoginResponse(
+        new TokenResponse(
             jwtProvider.createToken(memberId), jwtProvider.createRefreshToken(memberId)));
   }
 }
