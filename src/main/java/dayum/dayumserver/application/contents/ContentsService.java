@@ -26,10 +26,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ContentsService {
 
   private final ContentsRepository contentsRepository;
@@ -63,16 +66,22 @@ public class ContentsService {
   }
 
   public List<ContentsDetailResponse> recommend(ContentsRecommendRequest request) {
-    // TODO(chanjun.park):  For the MVP, recommendations are based only on the presence of
-    //  ingredients. We need to improve it to take ingredient quantities into account.
+    log.info(">> recommend 호출 | 요청된 재료: {}", request.ingredients());
+
     var ingredientNames =
         request.ingredients().stream()
             .map(ContentsRecommendRequest.IngredientRequest::name)
             .toList();
+    log.info("추출된 재료 이름 목록: {}", ingredientNames);
+
     var ingredients = ingredientService.findIngredientsByNames(ingredientNames);
-    return contentsRepository.fetchMakeableContents(ingredients, request.maxCount()).stream()
-        .map(ContentsDetailResponse::from)
-        .toList();
+
+    var result =
+        contentsRepository.fetchMakeableContents(ingredients, request.maxCount()).stream()
+            .map(ContentsDetailResponse::from)
+            .toList();
+
+    return result;
   }
 
   public ContentsAnalyzeResponse analyze(String contentsUrl, Long memberId) {

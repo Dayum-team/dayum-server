@@ -46,16 +46,13 @@ public interface ContentsJpaRepository extends JpaRepository<ContentsJpaEntity, 
   Optional<ContentsJpaEntity> findById(@Param("id") long id);
 
   @Query(
-      "SELECT contents.id "
-          + "FROM ContentsJpaEntity contents "
-          + "WHERE NOT EXISTS ("
-          + " SELECT 1 "
-          + " FROM ContentsIngredientJpaEntity contentIngredient "
-          + " WHERE contentIngredient.contents = contents "
-          + " AND contentIngredient.ingredient.id NOT IN :ingredientIds"
-          + ") "
-          + "AND contents.status = 'PUBLISHED' ")
-  List<Long> findAllMakeableIds(List<Long> ingredientIds, Pageable page);
+      "SELECT ci.contents.id "
+          + "FROM ContentsIngredientJpaEntity ci "
+          + "WHERE ci.ingredient.id IN :ingredientIds "
+          + "GROUP BY ci.contents.id "
+          + "ORDER BY COUNT(ci.contents.id) DESC, ci.contents.id DESC")
+  List<Long> findAllMakeableIds(
+      @Param("ingredientIds") List<Long> ingredientIds, Pageable pageable);
 
   @Query(
       "SELECT contents "
