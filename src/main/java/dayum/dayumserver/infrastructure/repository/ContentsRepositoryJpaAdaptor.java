@@ -59,7 +59,7 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   @Override
   public List<Contents> fetchMakeableContents(List<Ingredient> ingredients, int size) {
     if (ingredients == null || ingredients.isEmpty()) {
-      return Collections.emptyList();
+      return List.of();
     }
     var ingredientIds = ingredients.stream().map(Ingredient::id).toList();
 
@@ -69,7 +69,7 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
         "contentsJpaRepository.findAllMakeableIds() 조회 결과 (만들 수 있는 콘텐츠 ID 목록): {}", contentsIds);
 
     if (contentsIds.isEmpty()) {
-      return Collections.emptyList();
+      return List.of();
     }
 
     var contentsEntities = contentsJpaRepository.findAllByIdIn(contentsIds);

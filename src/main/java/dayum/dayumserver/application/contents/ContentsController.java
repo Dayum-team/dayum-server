@@ -10,7 +10,6 @@ import dayum.dayumserver.application.contents.dto.request.ContentsUploadRequest;
 import dayum.dayumserver.application.contents.dto.response.ContentsAnalyzeResponse;
 import dayum.dayumserver.application.contents.dto.response.ContentsDetailResponse;
 import dayum.dayumserver.application.contents.dto.response.ContentsResponse;
-import dayum.dayumserver.client.ai.chat.clova.ClovaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
