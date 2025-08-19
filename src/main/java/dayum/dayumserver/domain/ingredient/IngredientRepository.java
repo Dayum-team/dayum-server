@@ -9,5 +9,7 @@ public interface IngredientRepository {
 
   Optional<Ingredient> findByName(String name);
 
+  Optional<Ingredient> findByNameContaining(String name);
+
   List<Ingredient> findAllBy(List<Long> ingredientIds);
 }

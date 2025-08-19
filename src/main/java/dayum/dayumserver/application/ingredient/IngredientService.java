@@ -26,6 +26,13 @@ public class IngredientService {
         .toList();
   }
 
+  public List<Ingredient> findIngredientsByNamesContaining(List<String> ingredientNames) {
+    return ingredientNames.stream()
+        .map(ingredientRepository::findByNameContaining)
+        .flatMap(Optional::stream)
+        .toList();
+  }
+
   public List<Ingredient> findAllByIds(List<Long> ingredientIds) {
     return ingredientRepository.findAllBy(ingredientIds);
   }

@@ -108,7 +108,7 @@ public class ContentsService {
 
     List<String> ingredientNames =
         extractedIngredients.stream().map(ExtractedIngredientData::name).toList();
-    List<Ingredient> ingredients = ingredientService.findIngredientsByNames(ingredientNames);
+    List<Ingredient> ingredients = ingredientService.findIngredientsByNamesContaining(ingredientNames);
     return ContentsAnalyzeResponse.from(savedContents.id(), ingredients);
   }
 

@@ -48,4 +48,12 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
     // 3. 최종적으로 Domain 객체로 변환된 결과를 반환하는지 확인
     return entityOptional.map(ingredientMapper::mapToDomainEntity);
   }
+
+  @Override
+  public Optional<Ingredient> findByNameContaining(String name) {
+    return ingredientJpaRepository
+        .findFirstByNameContainingIgnoreCase(name)
+        .map(ingredientMapper::mapToDomainEntity);
+  }
+
 }
