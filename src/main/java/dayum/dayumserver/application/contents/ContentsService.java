@@ -66,6 +66,9 @@ public class ContentsService {
   }
 
   public List<ContentsDetailResponse> recommend(ContentsRecommendRequest request) {
+    // TODO(chanjun.park):  For the MVP, recommendations are based only on the presence of
+    //  ingredients. We need to improve it to take ingredient quantities into account.
+
     log.info(">> recommend 호출 | 요청된 재료: {}", request.ingredients());
 
     var ingredientNames =
