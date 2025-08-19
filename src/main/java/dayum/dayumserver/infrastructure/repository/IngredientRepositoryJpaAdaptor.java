@@ -36,16 +36,10 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
         .map(ingredientMapper::mapToDomainEntity)
         .toList();
   }
+
   @Override
   public Optional<Ingredient> findByName(String name) {
-    // 1. 어떤 이름으로 조회를 시작하는지 확인
-    log.info(">> findByName 호출 | name: '{}'", name);
-
-    // 2. DB 조회 결과(JPA Entity)가 있는지 확인
     Optional<IngredientJpaEntity> entityOptional = ingredientJpaRepository.findByName(name);
-    log.info("DB 조회 결과 (존재 여부): {}", entityOptional.isPresent() ? "찾음" : "못 찾음");
-
-    // 3. 최종적으로 Domain 객체로 변환된 결과를 반환하는지 확인
     return entityOptional.map(ingredientMapper::mapToDomainEntity);
   }
 
@@ -55,5 +49,4 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
         .findFirstByNameContainingIgnoreCase(name)
         .map(ingredientMapper::mapToDomainEntity);
   }
-
 }

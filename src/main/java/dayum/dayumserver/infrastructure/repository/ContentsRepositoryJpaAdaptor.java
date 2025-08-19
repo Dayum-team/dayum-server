@@ -62,7 +62,6 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
       return Collections.emptyList();
     }
     var ingredientIds = ingredients.stream().map(Ingredient::id).toList();
-    log.info(">> fetchMakeableContents 호출 | 재료 ID 목록: {}", ingredientIds);
 
     var contentsIds =
         contentsJpaRepository.findAllMakeableIds(ingredientIds, PageRequest.of(0, size));
@@ -74,9 +73,6 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
     }
 
     var contentsEntities = contentsJpaRepository.findAllByIdIn(contentsIds);
-    log.info(
-        "contentsJpaRepository.findAllByIdIn() 조회 결과 (콘텐츠 Entity 개수): {}", contentsEntities.size());
-
     return contentsEntities.stream().map(contentsMapper::mapToDomainEntity).toList();
   }
 }

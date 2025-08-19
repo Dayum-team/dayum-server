@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContentsController {
 
   private final ContentsService contentsService;
-  private final ClovaService clovaService;
 
   @GetMapping
   @JwtAuthWhiteList
