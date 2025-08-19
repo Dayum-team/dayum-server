@@ -21,7 +21,7 @@ public class IngredientService {
 
   public List<Ingredient> findIngredientsByNames(List<String> ingredientNames) {
     return ingredientNames.stream()
-        .map(name -> ingredientRepository.findByName(name))
+        .map(ingredientRepository::findByName)
         .flatMap(Optional::stream)
         .toList();
   }
