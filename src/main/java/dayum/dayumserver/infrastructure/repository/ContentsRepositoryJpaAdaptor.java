@@ -8,6 +8,8 @@ import dayum.dayumserver.infrastructure.repository.mapper.ContentsMapper;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
 
   private final ContentsJpaRepository contentsJpaRepository;
@@ -56,13 +59,20 @@ public class ContentsRepositoryJpaAdaptor implements ContentsRepository {
   @Override
   public List<Contents> fetchMakeableContents(List<Ingredient> ingredients, int size) {
     if (ingredients == null || ingredients.isEmpty()) {
-      return Collections.emptyList();
+      return List.of();
     }
     var ingredientIds = ingredients.stream().map(Ingredient::id).toList();
+
     var contentsIds =
         contentsJpaRepository.findAllMakeableIds(ingredientIds, PageRequest.of(0, size));
-    return contentsJpaRepository.findAllByIdIn(contentsIds).stream()
-        .map(contentsMapper::mapToDomainEntity)
-        .toList();
+    log.info(
+        "contentsJpaRepository.findAllMakeableIds() 조회 결과 (만들 수 있는 콘텐츠 ID 목록): {}", contentsIds);
+
+    if (contentsIds.isEmpty()) {
+      return List.of();
+    }
+
+    var contentsEntities = contentsJpaRepository.findAllByIdIn(contentsIds);
+    return contentsEntities.stream().map(contentsMapper::mapToDomainEntity).toList();
   }
 }

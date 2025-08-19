@@ -14,4 +14,6 @@ public interface IngredientJpaRepository extends JpaRepository<IngredientJpaEnti
   List<IngredientJpaEntity> findAllByNameLike(String name, Limit limit);
 
   Optional<IngredientJpaEntity> findFirstByNameContainingIgnoreCase(String name);
+
+  Optional<IngredientJpaEntity> findByName(String name);
 }

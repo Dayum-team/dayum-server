@@ -2,17 +2,21 @@ package dayum.dayumserver.infrastructure.repository;
 
 import dayum.dayumserver.domain.ingredient.Ingredient;
 import dayum.dayumserver.domain.ingredient.IngredientRepository;
+import dayum.dayumserver.infrastructure.repository.jpa.entity.IngredientJpaEntity;
 import dayum.dayumserver.infrastructure.repository.jpa.repository.IngredientJpaRepository;
 import dayum.dayumserver.infrastructure.repository.mapper.IngredientMapper;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
 
   private final IngredientJpaRepository ingredientJpaRepository;
@@ -35,6 +39,12 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
 
   @Override
   public Optional<Ingredient> findByName(String name) {
+    Optional<IngredientJpaEntity> entityOptional = ingredientJpaRepository.findByName(name);
+    return entityOptional.map(ingredientMapper::mapToDomainEntity);
+  }
+
+  @Override
+  public Optional<Ingredient> findByNameContaining(String name) {
     return ingredientJpaRepository
         .findFirstByNameContainingIgnoreCase(name)
         .map(ingredientMapper::mapToDomainEntity);
