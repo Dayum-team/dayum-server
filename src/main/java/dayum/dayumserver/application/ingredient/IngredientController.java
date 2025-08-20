@@ -16,7 +16,7 @@ public class IngredientController {
 
   private final IngredientService ingredientService;
 
-  @GetMapping
+  @GetMapping("/search")
   public ApiResponse<List<IngredientResponse>> searchIngredients(@RequestParam String keyword) {
     var ingredients = ingredientService.search(keyword);
     return ApiResponse.of(ingredients);
