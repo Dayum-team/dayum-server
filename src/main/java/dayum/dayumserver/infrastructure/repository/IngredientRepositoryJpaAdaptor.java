@@ -5,6 +5,8 @@ import dayum.dayumserver.domain.ingredient.IngredientRepository;
 import dayum.dayumserver.infrastructure.repository.jpa.entity.IngredientJpaEntity;
 import dayum.dayumserver.infrastructure.repository.jpa.repository.IngredientJpaRepository;
 import dayum.dayumserver.infrastructure.repository.mapper.IngredientMapper;
+
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +27,11 @@ public class IngredientRepositoryJpaAdaptor implements IngredientRepository {
   @Override
   public List<Ingredient> search(String keyword) {
     // TODO(chanjun.park): Update it after finalizing the ingredient search policy
-    return ingredientJpaRepository.findAllByNameLike("%" + keyword + "%", Limit.of(10)).stream()
+    String normalizedKeyword = Normalizer.normalize(keyword, Normalizer.Form.NFC);
+
+    return ingredientJpaRepository
+        .findAllByNameLike("%" + normalizedKeyword + "%", Limit.of(10))
+        .stream()
         .map(ingredientMapper::mapToDomainEntity)
         .toList();
   }
